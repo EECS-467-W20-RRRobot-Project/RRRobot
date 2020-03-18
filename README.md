@@ -1,4 +1,4 @@
-# RRRobot
+# RRRobot!
 
 ## Team
 
@@ -15,3 +15,5 @@
 ## Introduction
 
 Repository for UMICH EECS 467: Autonomous Robotics (W20) RRRobot! project.
+
+To get started, you will need to install Docker on your system. Information on what Docker is, how to install it, and how to use it can be found in [Getting Started with Docker](https://sravanbalaji.com/Web%20Pages/blog_docker.html).

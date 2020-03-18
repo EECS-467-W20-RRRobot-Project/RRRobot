@@ -1,0 +1,20 @@
+# Docker Compose
+
+# docker-compose.yml format version
+version: '3'
+
+# Define services
+services:
+    ros:
+        build: ./ros
+        volumes:
+            - ./ros:/app
+
+        working_dir: /app
+
+    gazebo:
+        build: ./gazebo
+        volumes:
+            - ./gazebo:/app
+
+        working_dir: /app
