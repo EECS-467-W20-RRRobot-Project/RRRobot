@@ -5,16 +5,46 @@ version: '3'
 
 # Define services
 services:
+    # ROS Service
     ros:
+        # Use Dockerfile in ros folder
         build: ./ros
+        # Mount ros folder on host to app folder in container
         volumes:
             - ./ros:/app
-
+        # Set DISPLAY variable and network mode for GUIs
+        environment:
+            - DISPLAY=${IP_ADDRESS}:0.0
+        network_mode: "host"
+        # Set working directory in container to app folder
         working_dir: /app
+    
+    # ROS Turtlesim Service
+    ros-turtlesim:
+        # Use Dockerfile in ros-turtlesim folder
+        build: ./ros-turtlesim
+        # Mount ros-turtlesim folder on host to app folder in container
+        volumes:
+            - ./ros-turtlesim:/app
+        # Set DISPLAY variable and network mode for GUIs
+        environment:
+            - DISPLAY=${IP_ADDRESS}:0.0
+        network_mode: "host"
+        # Set working directory in container to app folder
+        working_dir: /app
+        # Run turtlesim script when container is run
+        command: bash -c "./turtlesim.sh"
 
+    # Gazebo Service
     gazebo:
+        # Use Dockerfile in gazebo folder
         build: ./gazebo
+        # Mount gazebo folder on host to app folder in container
         volumes:
             - ./gazebo:/app
-
+        # Set DISPLAY variable and network mode for GUIs
+        environment:
+            - DISPLAY=${IP_ADDRESS}:0.0
+        network_mode: "host"
+        # Set working directory in container to app folder
         working_dir: /app
