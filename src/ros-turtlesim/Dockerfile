@@ -1,4 +1,4 @@
-# ROS Dockerfile
+# ROS Turtlesim Dockerfile
 
 # Use official image for ROS Melodic Morenia
 FROM ros:melodic
