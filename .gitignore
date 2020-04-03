@@ -1,0 +1,26 @@
+# Don't track the content of these folders #
+############################################
+rrrobot_src/lib/
+rrrobot_src/src/simulation_drivers/build
+rrrobot_src/src/simulation_drivers/devel
+rrrobot_src/src/simulation_drivers/install
+.*
+!.gitignore
+
+# Compiled source #
+###################
+*.o
+*.so
+
+# Packages #
+############
+*.tar
+*.gz
+*.zip
+
+# Other #
+#########
+*.backup
+*.old
+*.custom
+*.run

@@ -22,7 +22,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/.gazebo/models/fanuc_robotic_arm/meshes/base_link.STL</uri>
+            <uri>/home/rrrobot/rrrobot_src/src/gazebo_models/fanuc_robotic_arm/meshes/base_link.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -49,7 +49,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/.gazebo/models/fanuc_robotic_arm/meshes/base_link.STL</uri>
+            <uri>/home/rrrobot/rrrobot_src/src/gazebo_models/fanuc_robotic_arm/meshes/base_link.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -121,7 +121,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/.gazebo/models/fanuc_robotic_arm/meshes/arm_link_1.STL</uri>
+            <uri>/home/rrrobot/rrrobot_src/src/gazebo_models/fanuc_robotic_arm/meshes/arm_link_1.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -148,7 +148,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/.gazebo/models/fanuc_robotic_arm/meshes/arm_link_1.STL</uri>
+            <uri>/home/rrrobot/rrrobot_src/src/gazebo_models/fanuc_robotic_arm/meshes/arm_link_1.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -220,7 +220,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/.gazebo/models/fanuc_robotic_arm/meshes/arm_link_3.STL</uri>
+            <uri>/home/rrrobot/rrrobot_src/src/gazebo_models/fanuc_robotic_arm/meshes/arm_link_3.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -247,7 +247,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/.gazebo/models/fanuc_robotic_arm/meshes/arm_link_3.STL</uri>
+            <uri>/home/rrrobot/rrrobot_src/src/gazebo_models/fanuc_robotic_arm/meshes/arm_link_3.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -319,7 +319,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/.gazebo/models/fanuc_robotic_arm/meshes/arm_link_2.STL</uri>
+            <uri>/home/rrrobot/rrrobot_src/src/gazebo_models/fanuc_robotic_arm/meshes/arm_link_2.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -346,7 +346,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/.gazebo/models/fanuc_robotic_arm/meshes/arm_link_2.STL</uri>
+            <uri>/home/rrrobot/rrrobot_src/src/gazebo_models/fanuc_robotic_arm/meshes/arm_link_2.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -418,7 +418,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/.gazebo/models/fanuc_robotic_arm/meshes/arm_link_4.STL</uri>
+            <uri>/home/rrrobot/rrrobot_src/src/gazebo_models/fanuc_robotic_arm/meshes/arm_link_4.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -445,7 +445,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/.gazebo/models/fanuc_robotic_arm/meshes/arm_link_4.STL</uri>
+            <uri>/home/rrrobot/rrrobot_src/src/gazebo_models/fanuc_robotic_arm/meshes/arm_link_4.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -517,7 +517,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/.gazebo/models/fanuc_robotic_arm/meshes/arm_link_5.STL</uri>
+            <uri>/home/rrrobot/rrrobot_src/src/gazebo_models/fanuc_robotic_arm/meshes/arm_link_5.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -544,7 +544,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/.gazebo/models/fanuc_robotic_arm/meshes/arm_link_5.STL</uri>
+            <uri>/home/rrrobot/rrrobot_src/src/gazebo_models/fanuc_robotic_arm/meshes/arm_link_5.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -616,7 +616,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/.gazebo/models/fanuc_robotic_arm/meshes/arm_link_6.STL</uri>
+            <uri>/home/rrrobot/rrrobot_src/src/gazebo_models/fanuc_robotic_arm/meshes/arm_link_6.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -643,7 +643,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/.gazebo/models/fanuc_robotic_arm/meshes/arm_link_6.STL</uri>
+            <uri>/home/rrrobot/rrrobot_src/src/gazebo_models/fanuc_robotic_arm/meshes/arm_link_6.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -898,5 +898,7 @@
     </joint>
     <static>0</static>
     <allow_auto_disable>0</allow_auto_disable>
+
+    <plugin name="joint_angles" filename="libarm_angles.so"/>
   </model>
 </sdf>
