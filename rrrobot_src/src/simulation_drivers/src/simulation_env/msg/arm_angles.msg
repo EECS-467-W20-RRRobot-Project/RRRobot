@@ -1,0 +1,6 @@
+float32 shoulder_pivot_angle
+float32 shoulder_joint_angle
+float32 elbow_joint_angle
+float32 wrist_pivot_angle
+float32 wrist_joint_angle
+float32 end_effector_pivot_angle
