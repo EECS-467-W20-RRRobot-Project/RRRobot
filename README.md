@@ -97,3 +97,19 @@ Additionally, be sure to update the `IP_ADDRESS` variable in [.env](src/.env) wi
     - `cd /PATH/TO/rrrobot/src`
 4. Use Docker Compose to run a service (refer to [docker-compose.yml](src/docker-compose.yml) or [Docker Compose Services](#docker-compose-services))
    - `docker-compose run --rm <service_name>`
+
+
+### Building the simulation environment
+
+1. Build the drivers for the simulation
+   - `cd /home/rrrobot/rrrobot_src/src/simulation_env/`
+   - `source build.sh`
+
+
+### Running the simulation
+
+1. Start ros master node
+   - `roscore &`
+2. Run the gazebo simulator - this will bring up gazebo with a robotic arm
+   - `gazebo /home/rrrobot/rrrobot_src/world/rrrobot.world`
+3. Run control and perception programs
