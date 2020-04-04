@@ -900,5 +900,6 @@
     <allow_auto_disable>0</allow_auto_disable>
 
     <plugin name="joint_angles" filename="libarm_angles.so"/>
+    <plugin name="arm_control" filename="libarm_motors.so"/>
   </model>
 </sdf>

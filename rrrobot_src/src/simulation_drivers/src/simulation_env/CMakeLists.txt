@@ -52,6 +52,7 @@ find_package(gazebo REQUIRED)
 add_message_files(
   FILES
   arm_angles.msg
+  arm_command.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -129,6 +130,10 @@ add_library(arm_angles SHARED
   src/arm_angle_sensor_plugin.cpp
 )
 
+add_library(arm_motors SHARED
+  src/arm_motors.cpp
+)
+
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
@@ -137,7 +142,7 @@ add_library(arm_angles SHARED
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/simulation_env_node.cpp)
+add_executable(test_move_arm test/move_arm.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -147,12 +152,21 @@ add_library(arm_angles SHARED
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(test_move_arm arm_angles arm_motors)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(arm_angles
   ${catkin_LIBRARIES}
   ${GAZEBO_LIBRARIES}
+)
+
+target_link_libraries(arm_motors
+  ${catkin_LIBRARIES}
+  ${GAZEBO_LIBRARIES}
+)
+
+target_link_libraries(test_move_arm
+  ${catkin_LIBRARIES}
 )
 
 #############

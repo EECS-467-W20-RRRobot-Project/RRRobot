@@ -1,0 +1,6 @@
+float32 shoulder_pivot_force
+float32 shoulder_joint_force
+float32 elbow_joint_force
+float32 wrist_pivot_force
+float32 wrist_joint_force
+float32 end_effector_pivot_force
