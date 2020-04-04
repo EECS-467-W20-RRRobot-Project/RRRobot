@@ -1,6 +1,5 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
-#include <std_msgs/Float32.h>
 #include <memory>
 #include <iostream>
 
@@ -14,10 +13,10 @@ namespace gazebo
 {
   class JointAngle : public ModelPlugin
   {
-    public: 
+  public: 
     void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     {
-      cout << "Loading model" << endl;
+      cout << "Loading JointAngle sensor plugin for arm" << endl;
 
       model = _parent;
 
@@ -33,13 +32,12 @@ namespace gazebo
       publisher = nh->advertise<simulation_env::arm_angles>("arm_positions", 1);      
     }
 
-    private:
-
+  private:
     void onUpdate()
     {
-      //cout << __func__ << endl;
       simulation_env::arm_angles msg;
-      //msg.data = 0.0f;
+
+      // read in the joint angle for each joint in the arm
       msg.shoulder_pivot_angle = dynamic_cast<gazebo::physics::Joint*>(model->GetChild("shoulder_pivot").get())->Position();
       msg.shoulder_joint_angle = dynamic_cast<gazebo::physics::Joint*>(model->GetChild("shoulder_joint").get())->Position();
       msg.elbow_joint_angle = dynamic_cast<gazebo::physics::Joint*>(model->GetChild("elbow_joint").get())->Position();
@@ -47,18 +45,13 @@ namespace gazebo
       msg.wrist_joint_angle = dynamic_cast<gazebo::physics::Joint*>(model->GetChild("wrist_joint").get())->Position();
       msg.end_effector_pivot_angle = dynamic_cast<gazebo::physics::Joint*>(model->GetChild("end_effector_pivot").get())->Position();
       
-      //gazebo::physics::BasePtr joint = model->GetChild("shoulder_joint");
-      //cout << "Joint type: " << joint->GetType() << "joint type & EntityType::JOINT = " << (joint->GetType() & gazebo::physics::Base::EntityType::JOINT) << endl;
-      //if((joint->GetType() & gazebo::physics::Base::EntityType::JOINT) != 0)
-      //{
-        //cout << "Got an element of type JOINT" << endl;
-        //cout << "Joint Position: " << dynamic_cast<gazebo::physics::Joint*>(joint.get())->Position() << endl;
-        //msg.data = dynamic_cast<gazebo::physics::Joint*>(joint.get())->Position();
-	//cout << "Position: " << msg.data << endl;
-      //}
-      /*if(msg.data != 0.0f) */publisher.publish(msg);
+      // publish the updated sensor measurements
+      publisher.publish(msg);
+
+      // make sure the message gets published
       ros::spinOnce();
     }
+
     physics::ModelPtr model;
     event::ConnectionPtr updateConnection;
     std::unique_ptr<ros::NodeHandle> nh;
