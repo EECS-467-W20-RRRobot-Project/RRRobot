@@ -8,10 +8,10 @@ services:
     # ROS Development Service
     ros-dev:
         # Use Dockerfile in ros-dev folder
-        build: ./ros-dev
+        build: ./docker_env/ros-dev
         # Mount ros-dev folder on host to app folder in container
         volumes:
-            - ./ros-dev:/app
+            - .docker_env/ros-dev:/app
         # Set DISPLAY variable and network mode for GUIs
         environment:
             - DISPLAY=${IP_ADDRESS}:0.0
@@ -22,10 +22,10 @@ services:
     # ROS Turtlesim Service
     ros-turtlesim:
         # Use Dockerfile in ros-turtlesim folder
-        build: ./ros-turtlesim
+        build: ./docker_env/ros-turtlesim
         # Mount ros-turtlesim folder on host to app folder in container
         volumes:
-            - ./ros-turtlesim:/app
+            - ./docker_env/ros-turtlesim:/app
         # Set DISPLAY variable and network mode for GUIs
         environment:
             - DISPLAY=${IP_ADDRESS}:0.0
@@ -38,10 +38,10 @@ services:
     # ROS Production Service
     ros:
         # Use Dockerfile in ros folder
-        build: ./ros
+        build: ./docker_env/ros
         # Mount ros folder on host to app folder in container
         volumes:
-            - ./ros:/app
+            - ./docker_env/ros:/app
         # Set DISPLAY variable and network mode for GUIs
         environment:
             - DISPLAY=${IP_ADDRESS}:0.0
@@ -52,13 +52,15 @@ services:
     # Gazebo Production Service
     gazebo:
         # Use Dockerfile in gazebo folder
-        build: ./gazebo
+        build: ./docker_env/gazebo
         # Mount gazebo folder on host to app folder in container
         volumes:
-            - ./gazebo/.gazebo:/root/.gazebo
+            #- .docker_env/gazebo/.gazebo:/root/.gazebo
+            - ./rrrobot_src:/home/rrrobot/rrrobot_src
         # Set DISPLAY variable and network mode for GUIs
         environment:
             - DISPLAY=${IP_ADDRESS}:0.0
         network_mode: "host"
         # Set working directory in container to app folder
-        working_dir: /app
+        #working_dir: /home/rrrobot
+        hostname: "rrrobot-env"
