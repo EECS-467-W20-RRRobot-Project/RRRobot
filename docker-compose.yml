@@ -3,6 +3,10 @@
 # docker-compose.yml format version
 version: '3'
 
+networks:
+    ros:
+        driver: bridge
+
 # Define services
 services:
     # ROS Development Service
@@ -60,7 +64,9 @@ services:
         # Set DISPLAY variable and network mode for GUIs
         environment:
             - DISPLAY=${IP_ADDRESS}:0.0
-        network_mode: "host"
+        #network_mode: "host"
         # Set working directory in container to app folder
         #working_dir: /home/rrrobot
         hostname: "rrrobot-env"
+        networks:
+            - ros
