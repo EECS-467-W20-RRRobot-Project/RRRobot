@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(simulation_env)
+project(arm_control)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++11;-g3)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -10,14 +10,18 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
-  gazebo_ros
-  message_generation
 )
-find_package(gazebo REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
+find_package(orocos_kdl)
+find_package(kdl_parser)
 
+# sdfconfig
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(SDF sdformat REQUIRED)
+
+find_package(ignition-math6 REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -49,11 +53,11 @@ find_package(gazebo REQUIRED)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  arm_angles.msg
-  arm_command.msg
-)
+# add_message_files(
+#   FILES
+#   Message1.msg
+#   Message2.msg
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -70,10 +74,10 @@ add_message_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -105,9 +109,9 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include
-#  LIBRARIES simulation_env
-  CATKIN_DEPENDS roscpp std_msgs gazebo_ros
+  INCLUDE_DIRS include ../simulation_env/include
+#  LIBRARIES arm_control
+#  CATKIN_DEPENDS roscpp std_msgs
 #  DEPENDS system_lib
 )
 
@@ -118,32 +122,33 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include
+ include/arm_control
   ${catkin_INCLUDE_DIRS}
   ${roscpp_INCLUDE_DIRS}
-  ${std_msgs_INCLUDE_DIRS}
-  ${GAZEBO_INCLUDE_DIRS}
+  /usr/include/bullet
+  /usr/include/sdformat-6.2
+  /usr/include/ignition/math6
+  /home/rrrobot/rrrobot_src/devel/include/
+)
+include_directories(
+  /usr/include/eigen3
 )
 
 ## Declare a C++ library
-add_library(arm_angles SHARED
-  src/arm_angle_sensor_plugin.cpp
-)
-
-add_library(arm_motors SHARED
-  src/arm_motors.cpp
-)
+# add_library(${PROJECT_NAME}
+#   src/${PROJECT_NAME}/arm_control.cpp
+# )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-add_dependencies(arm_angles ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(arm_motors ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(test_move_arm test/move_arm.cpp)
+add_executable(${PROJECT_NAME}_node src/arm_controller.cpp src/arm.cpp)
+add_executable(test test/test.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -153,21 +158,23 @@ add_executable(test_move_arm test/move_arm.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(test_move_arm arm_angles arm_motors)
+add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(arm_angles
+target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
-  ${GAZEBO_LIBRARIES}
+  ${kdl_parser_LIBRARIES}
+  ${orocos_kdl_LIBRARIES}
+  ${SDF_LIBRARIES}
+  ignition-math6::ignition-math6
 )
 
-target_link_libraries(arm_motors
+target_link_libraries(test
   ${catkin_LIBRARIES}
-  ${GAZEBO_LIBRARIES}
-)
-
-target_link_libraries(test_move_arm
-  ${catkin_LIBRARIES}
+  ${kdl_parser_LIBRARIES}
+  ${orocos_kdl_LIBRARIES}
+  ${SDF_LIBRARIES}
+  ignition-math6::ignition-math6
 )
 
 #############
@@ -186,24 +193,24 @@ target_link_libraries(test_move_arm
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-# install(TARGETS ${PROJECT_NAME}_node
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS ${PROJECT_NAME}_node
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
-install(TARGETS arm_angles arm_motors
+# install(TARGETS ${PROJECT_NAME}
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION /home/rrrobot/rrrobot_src/lib/
+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
-)
+# )
 
 ## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
@@ -217,7 +224,7 @@ install(TARGETS arm_angles arm_motors
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_simulation_env.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_arm_control.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
