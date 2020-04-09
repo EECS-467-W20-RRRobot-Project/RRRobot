@@ -17,7 +17,7 @@ using namespace KDL;
 
 Arm arm("/home/rrrobot/rrrobot_src/src/gazebo_models/fanuc_robotic_arm/model.sdf");
 KDL::Chain chain = arm.getArm();
-KDL::Chain correct_chain;
+KDL::Chain simple_chain;
 
 void angle_callback(const simulation_env::arm_angles &msg)
 {
@@ -43,7 +43,21 @@ void angle_callback(const simulation_env::arm_angles &msg)
     kinematics_status = fksolver.JntToCart(jointpositions, cartpos);
     if (kinematics_status >= 0)
     {
-        std::cout << cartpos << std::endl;
+        cout << nj << endl;
+        cout << "shoulder_pivot: " << jointpositions(0) << endl;
+        cout << "shoulder_joint: " << jointpositions(1) << endl;
+        cout << "elbow_joint: " << jointpositions(2) << endl;
+        cout << "wrist_pivot: " << jointpositions(3) << endl;
+        cout << "wrist_joint: " << jointpositions(4) << endl;
+        cout << "end_effector_pivot: " << jointpositions(5) << endl;
+        std::cout << cartpos.p << std::endl;
+        double roll, pitch, yaw;
+        cartpos.M.GetRPY(roll, pitch, yaw);
+        cout << "roll: " << roll << endl;
+        cout << "pitch: " << pitch << endl;
+        cout << "yaw: " << yaw << endl;
+        cout << endl;
+        // std::cout << cartpos << std::endl;
         //printf("%s \n", "Succes, thanks KDL!");
     }
     else
@@ -64,6 +78,22 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     // publisher = nh.advertise<simulation_env::arm_command>("/arm_node/arm_commands", 1000);
     ros::Subscriber sub = nh.subscribe("/arm_node/arm_positions", 1000, angle_callback);
+
+    cout << "0 positions for each segment" << endl;
+    cout << "Base:" << endl;
+    cout << chain.getSegment(0).pose(0.0) << endl;
+    cout << "Link_1:" << endl;
+    cout << chain.getSegment(0).pose(0.0) * chain.getSegment(1).pose(0.0) << endl;
+    cout << "Link_2:" << endl;
+    cout << chain.getSegment(0).pose(0) * chain.getSegment(1).pose(0.0) * chain.getSegment(2).pose(0.0) << endl;
+    cout << "Link_3:" << endl;
+    cout << chain.getSegment(0).pose(0) * chain.getSegment(1).pose(0.0) * chain.getSegment(2).pose(0.0) * chain.getSegment(3).pose(0.0) << endl;
+    cout << "Link_4:" << endl;
+    cout << chain.getSegment(0).pose(0) * chain.getSegment(1).pose(0.0) * chain.getSegment(2).pose(0.0) * chain.getSegment(3).pose(0.0) * chain.getSegment(4).pose(0.0) << endl;
+    cout << "Link_5:" << endl;
+    cout << chain.getSegment(0).pose(0) * chain.getSegment(1).pose(0.0) * chain.getSegment(2).pose(0.0) * chain.getSegment(3).pose(0.0) * chain.getSegment(4).pose(0.0) * chain.getSegment(5).pose(0.0) << endl;
+    cout << "Link_6:" << endl;
+    cout << chain.getSegment(0).pose(0) * chain.getSegment(1).pose(0.0) * chain.getSegment(2).pose(0.0) * chain.getSegment(3).pose(0.0) * chain.getSegment(4).pose(0.0) * chain.getSegment(5).pose(0.0) * chain.getSegment(6).pose(0.0) << endl;
 
     // Assign some values to the joint positions
     // for (unsigned int i = 0; i < nj; i++)

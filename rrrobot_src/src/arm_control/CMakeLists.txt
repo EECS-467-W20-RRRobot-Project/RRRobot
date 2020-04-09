@@ -21,7 +21,7 @@ find_package(kdl_parser)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(SDF sdformat REQUIRED)
 
-find_package(ignition-math6 REQUIRED)
+find_package(ignition-math4 REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -127,7 +127,7 @@ include_directories(
   ${roscpp_INCLUDE_DIRS}
   /usr/include/bullet
   /usr/include/sdformat-6.2
-  /usr/include/ignition/math6
+  /usr/include/ignition/math4
   /home/rrrobot/rrrobot_src/devel/include/
 )
 include_directories(
@@ -148,7 +148,7 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_node src/arm_controller.cpp src/arm.cpp)
-add_executable(test test/test.cpp)
+add_executable(test test/test.cpp src/arm.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -166,7 +166,7 @@ target_link_libraries(${PROJECT_NAME}_node
   ${kdl_parser_LIBRARIES}
   ${orocos_kdl_LIBRARIES}
   ${SDF_LIBRARIES}
-  ignition-math6::ignition-math6
+  ignition-math4::ignition-math4
 )
 
 target_link_libraries(test
@@ -174,7 +174,7 @@ target_link_libraries(test
   ${kdl_parser_LIBRARIES}
   ${orocos_kdl_LIBRARIES}
   ${SDF_LIBRARIES}
-  ignition-math6::ignition-math6
+  ignition-math4::ignition-math4
 )
 
 #############

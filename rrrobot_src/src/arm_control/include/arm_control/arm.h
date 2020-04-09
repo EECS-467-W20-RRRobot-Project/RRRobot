@@ -63,6 +63,7 @@ public:
 
 private:
     KDL::Chain arm;
+    KDL::Chain simple_arm;
 
     /*
      * i_com: the inertia about the center of mass of this link
