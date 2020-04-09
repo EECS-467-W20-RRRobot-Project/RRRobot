@@ -224,7 +224,14 @@ install(DIRECTORY include/${PROJECT_NAME}/
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_arm_control.cpp)
+catkin_add_gtest(${PROJECT_NAME}-test test/test_internal_arm_representation.cpp src/arm.cpp)
+target_link_libraries(${PROJECT_NAME}-test
+  ${catkin_LIBRARIES}
+  ${kdl_parser_LIBRARIES}
+  ${orocos_kdl_LIBRARIES}
+  ${SDF_LIBRARIES}
+  ignition-math4::ignition-math4
+)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

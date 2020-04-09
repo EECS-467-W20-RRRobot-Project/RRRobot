@@ -119,7 +119,7 @@ Arm::Arm(const std::string &sdf_file)
         else if (axis_num == 2)
             joint_type = KDL::Joint::JointType::RotZ;
 
-        links[child].joint = KDL::Joint(name, joint_type);
+        links[child].joint = KDL::Joint(name, joint_type); // correct
 
         stringstream pose_string(joint->GetElement("pose")->GetValue()->GetAsString());
         float x, y, z;
@@ -128,13 +128,14 @@ Arm::Arm(const std::string &sdf_file)
 
         KDL::Rotation frame_rotation = KDL::Rotation::RPY(roll, pitch, yaw);
         KDL::Vector frame_location(x, y, z);
-        links[child].joint_frame = KDL::Frame(frame_rotation, frame_location);
+        links[child].joint_frame = KDL::Frame(frame_rotation, frame_location); // incorrect --> this is actually the
 
         joint = joint->GetNextElement("joint");
     }
 
     string cur_link_name = "world";
     KDL::Frame prev_frame(KDL::Rotation::RPY(0, 0, 0), KDL::Vector(0, 0, 0));
+    KDL::Joint::JointType to_set(KDL::Joint::JointType::None);
 
     while (link_ordering.find(cur_link_name) != link_ordering.end())
     {
@@ -145,45 +146,47 @@ Arm::Arm(const std::string &sdf_file)
         KDL::Frame prev_frame_inverse = prev_frame.Inverse();
         KDL::Frame joint_relative_to_prev = prev_frame.Inverse() * joint_in_world;
 
-        // EXPERIMENTAL - update rotation axis
-        KDL::Vector uncorrected_axis(0, 0, 0);
+        // // EXPERIMENTAL - update rotation axis
+        // KDL::Vector uncorrected_axis(0, 0, 0);
 
-        if (links[cur_link_name].joint.getType() == KDL::Joint::JointType::RotX)
-        {
-            uncorrected_axis = KDL::Vector(1, 0, 0);
-        }
-        else if (links[cur_link_name].joint.getType() == KDL::Joint::JointType::RotY)
-        {
-            uncorrected_axis = KDL::Vector(0, 1, 0);
-        }
-        else if (links[cur_link_name].joint.getType() == KDL::Joint::JointType::RotZ)
-        {
-            uncorrected_axis = KDL::Vector(0, 0, 1);
-        }
+        // if (links[cur_link_name].joint.getType() == KDL::Joint::JointType::RotX)
+        // {
+        //     uncorrected_axis = KDL::Vector(1, 0, 0);
+        // }
+        // else if (links[cur_link_name].joint.getType() == KDL::Joint::JointType::RotY)
+        // {
+        //     uncorrected_axis = KDL::Vector(0, 1, 0);
+        // }
+        // else if (links[cur_link_name].joint.getType() == KDL::Joint::JointType::RotZ)
+        // {
+        //     uncorrected_axis = KDL::Vector(0, 0, 1);
+        // }
 
-        KDL::Vector corrected_axis = joint_relative_to_prev.M * uncorrected_axis;
+        // KDL::Vector corrected_axis = joint_relative_to_prev.M * uncorrected_axis;
 
-        double x = fabs(corrected_axis.x());
-        double y = fabs(corrected_axis.y());
-        double z = fabs(corrected_axis.z());
+        // double x = fabs(corrected_axis.x());
+        // double y = fabs(corrected_axis.y());
+        // double z = fabs(corrected_axis.z());
 
-        const string &name(links[cur_link_name].joint.getName());
-        if (x > y and x > z)
-        {
-            links[cur_link_name].joint = KDL::Joint(name, KDL::Joint::JointType::RotX);
-        }
-        else if (y > x and y > z)
-        {
-            links[cur_link_name].joint = KDL::Joint(name, KDL::Joint::JointType::RotY);
-        }
-        else if (z > x and z > y)
-        {
-            links[cur_link_name].joint = KDL::Joint(name, KDL::Joint::JointType::RotZ);
-        }
-        // END EXPERIMENTAL
+        // const string &name(links[cur_link_name].joint.getName());
+        // if (x > y and x > z)
+        // {
+        //     links[cur_link_name].joint = KDL::Joint(name, KDL::Joint::JointType::RotX);
+        // }
+        // else if (y > x and y > z)
+        // {
+        //     links[cur_link_name].joint = KDL::Joint(name, KDL::Joint::JointType::RotY);
+        // }
+        // else if (z > x and z > y)
+        // {
+        //     links[cur_link_name].joint = KDL::Joint(name, KDL::Joint::JointType::RotZ);
+        // }
+        // // END EXPERIMENTAL
 
+        KDL::Joint::JointType next(links[cur_link_name].joint.getType());
         KDL::RigidBodyInertia inertia(links[cur_link_name].mass, links[cur_link_name].com_location, links[cur_link_name].rotational_inertia);
-        KDL::Segment to_add(links[cur_link_name].link_name, links[cur_link_name].joint, joint_relative_to_prev, inertia);
+        KDL::Segment to_add(links[cur_link_name].link_name, KDL::Joint(links[cur_link_name].joint.getName(), to_set), joint_relative_to_prev, inertia);
+        to_set = next;
 
         // cout << cur_link_name << endl;
 
@@ -201,6 +204,8 @@ Arm::Arm(const std::string &sdf_file)
 
         prev_frame = joint_in_world;
     }
+
+    arm.addSegment(KDL::Segment(string("pseudo_link"), KDL::Joint("pseudo_joint", to_set), KDL::Frame::Identity(), KDL::RigidBodyInertia()));
 
     cout << "# of arm segments: " << arm.getNrOfSegments() << "\t# of arm joints: " << arm.getNrOfJoints() << endl;
     fksolver.reset(new KDL::ChainFkSolverPos_recursive(arm));
