@@ -302,16 +302,13 @@ Arm::Arm(const std::string &sdf_file)
 
         //KDL::Segment to_add(cur.getName(), cur.getJoint(), KDL::Frame(new_rotation, new_position), cur.getInertia());
         arm.addSegment(to_add);
-        if (simple_arm.getNrOfSegments() < 4)
-        {
-            simple_arm.addSegment(to_add);
-        }
 
         prev_frame = joint_in_world;
         // prev_frame_world_transform = cur_frame_world_transform;
     }
 
     cout << arm.getNrOfJoints() << '\t' << arm.getNrOfSegments() << endl;
+    fksolver.reset(new KDL::ChainFkSolverPos_recursive(arm));
 }
 
 /*
@@ -370,6 +367,15 @@ float Arm::getSupportedMass(const std::string &link_name)
  */
 std::vector<float> Arm::getRequiredTorques(/*std::vector<float> theta_des, std::vector<float> theta_dot_des, */ std::vector<float> theta_double_dot_des)
 {
+}
+
+/*
+ * Using the provided joint positions, this calculates the pose of the end of the
+ * arm. Returns whether it was successful
+ */
+bool Arm::calculateForwardKinematics(KDL::JntArray joint_positions, KDL::Frame &end_effector_frame)
+{
+    return fksolver->JntToCart(joint_positions, end_effector_frame);
 }
 
 const KDL::Chain &Arm::getArm() const

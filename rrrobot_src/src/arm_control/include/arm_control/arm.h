@@ -5,6 +5,9 @@
 #include <kdl/joint.hpp>
 #include <kdl/frames.hpp>
 #include <LinearMath/btTransform.h>
+#include <kdl/chainfksolver.hpp>
+#include <kdl/chainfksolverpos_recursive.hpp>
+#include <memory>
 
 #include <string>
 
@@ -59,11 +62,19 @@ public:
      */
     std::vector<float> getRequiredTorques(/*std::vector<float> theta_des, std::vector<float> theta_dot_des, */ std::vector<float> theta_double_dot_des);
 
+    /*
+     * Using the provided joint positions, this calculates the position of the end of the
+     * arm. Returns whether it was successful
+     */
+    bool calculateForwardKinematics(KDL::JntArray joint_positions, KDL::Frame &end_effector_frame);
+
     const KDL::Chain &getArm() const;
 
 private:
     KDL::Chain arm;
-    KDL::Chain simple_arm;
+
+    // Create solver based on kinematic chain
+    std::unique_ptr<KDL::ChainFkSolverPos_recursive> fksolver;
 
     /*
      * i_com: the inertia about the center of mass of this link
