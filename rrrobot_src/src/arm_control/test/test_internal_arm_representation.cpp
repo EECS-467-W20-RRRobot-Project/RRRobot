@@ -12,6 +12,11 @@ double getDistance(const KDL::Vector &a, const KDL::Vector &b)
     return sqrt(pow(a.x() - b.x(), 2) + pow(a.y() - b.y(), 2) + pow(a.z() - b.z(), 2));
 }
 
+void EXPECT_ROTATION_EQ(const KDL::Rotation &a, const KDL::Rotation &b)
+{
+    EXPECT_TRUE(KDL::Equal(a, b, 0.005));
+}
+
 TEST(ArmRepresentationTests, shoulder_pivot)
 {
     Arm arm("/home/rrrobot/rrrobot_src/src/gazebo_models/fanuc_robotic_arm/model.sdf");
@@ -89,6 +94,31 @@ TEST(ArmRepresentationTests, end_effector_pivot)
         arm.calculateForwardKinematics(jointpositions, cartpos);
         EXPECT_NEAR(getDistance(cartpos.p, correct), 0.0, ALLOWED_ERROR);
     }
+}
+
+TEST(ArmRepresentationTests, all_joints_rotated)
+{
+    Arm arm("/home/rrrobot/rrrobot_src/src/gazebo_models/fanuc_robotic_arm/model.sdf");
+
+    // Create joint array
+    unsigned int nj = arm.getArm().getNrOfJoints();
+    KDL::JntArray jointpositions = KDL::JntArray(nj);
+
+    jointpositions(0) = -12.0027;
+    jointpositions(1) = -1.86177;
+    jointpositions(2) = -0.991728;
+    jointpositions(3) = 39.5032;
+    jointpositions(4) = -1.45472;
+    jointpositions(5) = -25.4681;
+
+    // Create the frame that will contain the results
+    KDL::Frame cartpos;
+    KDL::Vector correct(-0.876742, 1.85761, 0.482547);
+    KDL::Rotation correct_rot = KDL::Rotation::RPY(-1.75917, -0.0162929, -0.823634);
+
+    arm.calculateForwardKinematics(jointpositions, cartpos);
+    EXPECT_NEAR(getDistance(cartpos.p, correct), 0.0, ALLOWED_ERROR);
+    EXPECT_ROTATION_EQ(cartpos.M, correct_rot);
 }
 
 int main(int argc, char **argv)
