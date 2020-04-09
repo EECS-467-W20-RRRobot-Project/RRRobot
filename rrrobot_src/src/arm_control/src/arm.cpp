@@ -53,25 +53,19 @@ Arm::Arm(const std::string &sdf_file)
     sdf::ElementPtr link = model->GetElement("link");
     while (link)
     {
-        cout << "Link: " << link->Get<string>("name") << endl;
+        // cout << "Link: " << link->Get<string>("name") << endl;
 
         const string name(link->Get<string>("name"));
         links[name].link_name = name;
-        // KDL::Joint cur_joint(KDL::Joint::None);
 
         const sdf::ElementPtr inertial_data = link->GetElement("inertial");
         float mass = inertial_data->Get<float>("mass");
         links[name].mass = mass;
-        cout << "Mass: " << mass << endl;
+        // cout << "Mass: " << mass << endl;
 
+        // Get the center of mass for this link
         stringstream inertial_data_ss(inertial_data->GetElement("pose")->GetValue()->GetAsString());
-        // stringstream inertial_data_ss(inertial_data_s);
-        // KDL::Vector inertial_frame_info;
-
         inertial_data_ss >> links[name].com_location.data[0] >> links[name].com_location.data[1] >> links[name].com_location[2];
-        // inertial_data_ss >> inertial_frame_info.data[0];
-        // inertial_data_ss >> inertial_frame_info.data[1];
-        // inertial_data_ss >> inertial_frame_info.data[2];
 
         const sdf::ElementPtr inertia = inertial_data->GetElement("inertia");
         links[name].rotational_inertia = KDL::RotationalInertia(
@@ -82,8 +76,6 @@ Arm::Arm(const std::string &sdf_file)
             inertia->Get<float>("ixz"),
             inertia->Get<float>("iyz"));
 
-        //KDL::RigidBodyInertia link_inertia(mass, inertial_frame_info, rotational_inertia);
-
         // Transformation from world to link coordinates
         stringstream frame_location(link->GetElement("pose")->GetValue()->GetAsString());
         float x, y, z;
@@ -93,53 +85,8 @@ Arm::Arm(const std::string &sdf_file)
         KDL::Vector link_position(x, y, z);
         links[name].link_frame = KDL::Frame(rotation, link_position);
 
-        //KDL::Segment cur_link(name, cur_joint, KDL::Frame::Identity(), link_inertia);
-        //arm.addSegment(cur_link);
-        //links[name] = cur_link;
-
-        // cout << inertia->Get<float>("ixx") << endl;
-        // cout << inertia->Get<float>("iyy") << endl;
-        // cout << inertia->Get<float>("izz") << endl;
-        // cout << inertia->Get<float>("ixy") << endl;
-        // cout << inertia->Get<float>("ixz") << endl;
-        // cout << inertia->Get<float>("iyz") << endl;
-
-        // inertial_data->GetElement("pose")->PrintValues(""); //PrintValues("");
-        // cout << inertial_data->GetElement("pose")->GetAttributeCount() << endl;
-        // const sdf::ParamPtr pose = inertial_data->GetElement("pose")->GetValue();
-        // const sdf::ElementPtr pose_elt = inertial_data->GetElement("pose");
-        // cout << pose->GetAsString() << endl;
-        // // cout << pose->IsType<ignition::math::Pose3>() << endl;
-        // cout << pose << endl;
-        // cout << *pose_elt->GetValue() << endl;
-        // sdf::ElementPtr cur = pose_elt->GetFirstElement();
-        // while (cur)
-        // {
-        //     cout << cur->Get<float>() << endl;
-
-        //     cur = cur->GetNextElement();
-        // }
-
-        //ignition::math::Pose3 inertial_pose = inertial_data->Get<ignition::math::Pose3>("pose");
-        //cout << "Inertial pose: " << inertial_pose << endl; //inertial_pose.pos.x << '\t' << inertial_pose.pos.y << '\t' <<  << endl;
-        // float data;
-        // while (data << inertial_pose)
-        // {
-        //     cout << data << '\t';
-        // }
-        // cout << endl;
-        // KDL::RigidBodyInertia(
-        //     inertial_data->Get<float>("mass"),
-
-        // );
-        // KDL::Segment
-        // current_link()
-        //     arm.addSegment()
-
         link = link->GetNextElement("link");
     }
-
-    cout << "# of arm segments: " << arm.getNrOfSegments() << "\t# of arm joints: " << arm.getNrOfJoints() << endl;
 
     sdf::ElementPtr joint = model->GetElement("joint");
     while (joint) // TODO(dwitcpa): add support for translational joints
@@ -151,7 +98,7 @@ Arm::Arm(const std::string &sdf_file)
         if (parent == string("world"))
         {
             joint = joint->GetNextElement("joint");
-            continue; //first_link = child;
+            continue;
         }
 
         stringstream axis(joint->GetElement("axis")->GetElement("xyz")->GetValue()->GetAsString());
@@ -183,67 +130,22 @@ Arm::Arm(const std::string &sdf_file)
         KDL::Vector frame_location(x, y, z);
         links[child].joint_frame = KDL::Frame(frame_rotation, frame_location);
 
-        //links[child] = KDL::Segment(links[child].getName(), cur_joint, KDL::Frame(frame_rotation, frame_location), links[child].getInertia());
-        //KDL::Segment cur_segment = arm.getSegment
-
         joint = joint->GetNextElement("joint");
     }
 
     string cur_link_name = "world";
     KDL::Frame prev_frame(KDL::Rotation::RPY(0, 0, 0), KDL::Vector(0, 0, 0));
-    // btTransform prev_frame_world_transform(btMatrix3x3::getIdentity());
+
     while (link_ordering.find(cur_link_name) != link_ordering.end())
     {
         cur_link_name = link_ordering[cur_link_name];
 
         // get the world coordinates of the joint
-        // KDL::Vector global_joint_location = links[link_name].link_frame * links[link_name].joint_frame * KDL::Vector(0, 0, 0);
-        // KDL::Vector previous_global_joint = prev_frame * KDL::Vector(0, 0, 0);
-
-        // KDL::Vector translation = global_joint_location - previous_global_joint;
-
         KDL::Frame joint_in_world = links[cur_link_name].link_frame * links[cur_link_name].joint_frame;
         KDL::Frame prev_frame_inverse = prev_frame.Inverse();
         KDL::Frame joint_relative_to_prev = prev_frame.Inverse() * joint_in_world;
-        // joint_relative_to_prev = joint_relative_to_prev.Inverse();
-
-        // const KDL::Segment &cur = links[cur_link_name];
-        // const KDL::Frame &cur_frame = cur.getFrameToTip();
-        // double cur_roll, cur_pitch, cur_yaw;
-        // cur_frame.M.GetRPY(cur_roll, cur_pitch, cur_yaw);
-        // double prev_roll, prev_pitch, prev_yaw;
-        // prev_frame.M.GetRPY(prev_roll, prev_pitch, prev_yaw);
-        // KDL::Rotation new_rotation = KDL::Rotation::RPY(cur_roll - prev_roll, cur_pitch - prev_pitch, cur_yaw - prev_yaw);
-        // double roll, pitch, yaw;
-        // new_rotation.GetRPY(roll, pitch, yaw);
-
-        // KDL::Vector cur_pos = cur_frame.p;
-        // KDL::Vector prev_pos = prev_frame.p;
-        // KDL::Vector new_position(cur_pos.x() /* - prev_pos.x()*/, cur_pos.y() /*  - prev_pos.y()*/, cur_pos.z() /* - prev_pos.z()*/);
-
-        // // const KDL::Rotation &cur_rotation = cur_frame.M;
-        // // const KDL::Vector &cur_translation = cur_frame.p;
-        // // const KDL::Vector &rot_x = cur_rotation.UnitX();
-        // // const KDL::Vector &rot_y = cur_rotation.UnitY();
-        // // const KDL::Vector &rot_z = cur_rotation.UnitZ();
-
-        // // btTransform cur_frame_world_transform(
-        // //     btMatrix3x3(rot_x[0], rot_y[0], rot_z[0],
-        // //                 rot_x[1], rot_y[1], rot_z[1],
-        // //                 rot_x[2], rot_y[2], rot_z[2]),
-        // //     btVector3(btScalar(cur_translation.x()),
-        // //               btScalar(cur_translation.y()),
-        // //               btScalar(cur_translation.z())));
-        // // btTransform transform;
-        // // //transform.mult(prev_frame_world_transform, cur_frame_world_transform /*.inverse()*/);
-        // // transform = cur_frame float roll, pitch, yaw;
-        // // transform.getRotation().getEulerZYX(yaw, pitch, roll);
-        // // KDL::Rotation rot(KDL::Rotation::RPY(roll, pitch, yaw));
-        // // btVector3 translation = transform.getOrigin();
-        // // KDL::Vector trans((float)translation.getX(), (float)translation.getY(), (float)translation.getZ());
 
         // EXPERIMENTAL - update rotation axis
-
         KDL::Vector uncorrected_axis(0, 0, 0);
 
         if (links[cur_link_name].joint.getType() == KDL::Joint::JointType::RotX)
@@ -278,36 +180,29 @@ Arm::Arm(const std::string &sdf_file)
         {
             links[cur_link_name].joint = KDL::Joint(name, KDL::Joint::JointType::RotZ);
         }
-
         // END EXPERIMENTAL
 
         KDL::RigidBodyInertia inertia(links[cur_link_name].mass, links[cur_link_name].com_location, links[cur_link_name].rotational_inertia);
         KDL::Segment to_add(links[cur_link_name].link_name, links[cur_link_name].joint, joint_relative_to_prev, inertia);
 
-        cout << cur_link_name << endl;
-        // cout << "\tprev_frame world transform (";
+        // cout << cur_link_name << endl;
+
         double roll, pitch, yaw;
-        cout << "  joint in world coordinates:" << endl;
-        cout << joint_in_world << endl;
-        cout << "  joint in previous joint's frame:" << endl;
-        cout << joint_relative_to_prev << endl;
-        cout << "  previous frame inverse:" << endl;
-        cout << prev_frame_inverse << endl;
-        cout << "Joint type: " << links[cur_link_name].joint.getTypeName() << "\n\n"
-             << endl;
+        // cout << "  joint in world coordinates:" << endl;
+        // cout << joint_in_world << endl;
+        // cout << "  joint in previous joint's frame:" << endl;
+        // cout << joint_relative_to_prev << endl;
+        // cout << "  previous frame inverse:" << endl;
+        // cout << prev_frame_inverse << endl;
+        // cout << "Joint type: " << links[cur_link_name].joint.getTypeName() << "\n\n"
+        //      << endl;
 
-        // joint_relative_to_prev.M.GetRPY(roll, pitch, yaw);
-        // cout << "\tOrigin position: " << joint_relative_to_prev.p.x() << ", " << joint_relative_to_prev.p.y() << ", " << joint_relative_to_prev.p.z() << endl;
-        // cout << "\tFrame rotation (roll, pitch, yaw): (" << roll << ", " << pitch << ", " << yaw << ")" << endl;
-
-        //KDL::Segment to_add(cur.getName(), cur.getJoint(), KDL::Frame(new_rotation, new_position), cur.getInertia());
         arm.addSegment(to_add);
 
         prev_frame = joint_in_world;
-        // prev_frame_world_transform = cur_frame_world_transform;
     }
 
-    cout << arm.getNrOfJoints() << '\t' << arm.getNrOfSegments() << endl;
+    cout << "# of arm segments: " << arm.getNrOfSegments() << "\t# of arm joints: " << arm.getNrOfJoints() << endl;
     fksolver.reset(new KDL::ChainFkSolverPos_recursive(arm));
 }
 
@@ -381,6 +276,17 @@ bool Arm::calculateForwardKinematics(KDL::JntArray joint_positions, KDL::Frame &
 const KDL::Chain &Arm::getArm() const
 {
     return arm;
+}
+
+void Arm::print() const
+{
+    for (const KDL::Segment &seg : arm.segments)
+    {
+        cout << seg.getName() << endl;
+        cout << seg.getFrameToTip() << endl;
+        cout << seg.getJoint().getTypeName() << endl;
+        cout << endl;
+    }
 }
 
 /*

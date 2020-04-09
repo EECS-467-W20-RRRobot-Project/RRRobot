@@ -70,6 +70,8 @@ public:
 
     const KDL::Chain &getArm() const;
 
+    void print() const;
+
 private:
     KDL::Chain arm;
 
