@@ -209,6 +209,8 @@ Arm::Arm(const std::string &sdf_file)
 
     cout << "# of arm segments: " << arm.getNrOfSegments() << "\t# of arm joints: " << arm.getNrOfJoints() << endl;
     fksolver.reset(new KDL::ChainFkSolverPos_recursive(arm));
+    iksolver.reset(new KDL::ChainIkSolverPos_LMA(arm));
+    idsolver.reset(new KDL::ChainIdSolver_RNE(arm, KDL::Vector(0, 0, -9.81)));
 }
 
 /*
@@ -276,6 +278,21 @@ std::vector<float> Arm::getRequiredTorques(/*std::vector<float> theta_des, std::
 bool Arm::calculateForwardKinematics(KDL::JntArray joint_positions, KDL::Frame &end_effector_frame)
 {
     return fksolver->JntToCart(joint_positions, end_effector_frame);
+}
+
+bool Arm::calculateInverseKinematics(const KDL::JntArray &cur_configuration, const KDL::Frame &desired_end_effector_frame, KDL::JntArray &final_configuration)
+{
+    return iksolver->CartToJnt(cur_configuration, desired_end_effector_frame, final_configuration);
+}
+
+int Arm::calculateInverseDynamics(const KDL::JntArray &pos, const KDL::JntArray &vel, const KDL::JntArray &accel, const KDL::Wrenches &f_external, KDL::JntArray &required_torque)
+{
+    // cout << pos.rows() << endl;
+    // cout << vel.rows() << endl;
+    // cout << accel.rows() << endl;
+    // cout << f_external.size() << endl;
+    // cout << required_torque.rows() << endl;
+    return idsolver->CartToJnt(pos, vel, accel, f_external, required_torque);
 }
 
 const KDL::Chain &Arm::getArm() const

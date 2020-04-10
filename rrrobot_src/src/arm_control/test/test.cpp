@@ -24,7 +24,8 @@ int main(int argc, char **argv)
 {
     //Definition of a kinematic chain & add segments to the chain
     Arm arm(/*"/home/rrrobot/rrrobot_src/src/gazebo_models/basic_arm/model.sdf"); /(*/ "/home/rrrobot/rrrobot_src/src/gazebo_models/fanuc_robotic_arm/model.sdf");
-    KDL::Chain chain = arm.getArm();
+    //KDL::Chain chain = arm.getArm();
+
     // chain.addSegment(Segment(Joint(Joint::RotZ), Frame(Vector(0.0, 0.0, 0.0))));
     // chain.addSegment(Segment(Joint(Joint::RotX), Frame(Vector(0, 0, 1))));
     // chain.addSegment(Segment(Joint(Joint::RotX), Frame(Vector(0, 0, 1))));
@@ -35,10 +36,10 @@ int main(int argc, char **argv)
     // chain.addSegment(Segment(Joint(Joint::RotZ)));
 
     // Create solver based on kinematic chain
-    ChainFkSolverPos_recursive fksolver = ChainFkSolverPos_recursive(chain);
+    //ChainFkSolverPos_recursive fksolver = ChainFkSolverPos_recursive(chain);
 
     // Create joint array
-    unsigned int nj = chain.getNrOfJoints();
+    unsigned int nj = arm.getArm().getNrOfJoints();
     KDL::JntArray jointpositions = JntArray(nj);
     for (int pos = 0; pos < nj; ++pos)
     {
@@ -88,6 +89,9 @@ int main(int argc, char **argv)
     KDL::Frame cartpos;
     ofstream f_raw("configurations.txt");
     ofstream f_corrected("corrected_configurations.txt");
+    int which_joint;
+    cout << "Which joint should be moved (0: shoulder pivot, 5: end effector pivot): ";
+    cin >> which_joint;
 
     for (double shoulder_pivot = 0.0; shoulder_pivot <= 6.28; shoulder_pivot += 0.1)
     {
@@ -107,8 +111,8 @@ int main(int argc, char **argv)
         //         // printf("%s \n", "Error: could not calculate forward kinematics :(");
         //     }
         // }
-        jointpositions(5) = shoulder_pivot;
-        kinematics_status = fksolver.JntToCart(jointpositions, cartpos);
+        jointpositions(which_joint) = shoulder_pivot;
+        kinematics_status = arm.calculateForwardKinematics(jointpositions, cartpos); //fksolver.JntToCart(jointpositions, cartpos);
         cout << "Final position: " << endl;
         cout << cartpos << endl;
 
@@ -119,4 +123,36 @@ int main(int argc, char **argv)
         f_corrected << corrected.x() << "," << corrected.y() << "," << corrected.z() << "\n";
     }
     // }
+
+    KDL::Frame desired(KDL::Vector(0.000767, -1.87014, 2.0658));
+    KDL::JntArray final_config(arm.getArm().getNrOfJoints());
+    bool error = arm.calculateInverseKinematics(jointpositions, desired, final_config);
+    if (error == false)
+    {
+        for (int joint = 0; joint < arm.getArm().getNrOfJoints(); ++joint)
+        {
+            cout << final_config(joint) << endl;
+        }
+    }
+    else
+    {
+        cout << "Failed to find configuration" << endl;
+    }
+
+    KDL::JntArray vel(arm.getArm().getNrOfJoints());
+    KDL::JntArray accel(arm.getArm().getNrOfJoints());
+    KDL::Wrenches ext_force(arm.getArm().getNrOfSegments());
+    KDL::JntArray required_force(arm.getArm().getNrOfJoints());
+    int error_val = arm.calculateInverseDynamics(jointpositions, vel, accel, ext_force, required_force);
+    if (error_val == 0)
+    {
+        for (int joint = 0; joint < arm.getArm().getNrOfJoints(); ++joint)
+        {
+            cout << required_force(joint) << endl;
+        }
+    }
+    else
+    {
+        cout << "Failed to find required torques, error #" << error_val << endl;
+    }
 }
