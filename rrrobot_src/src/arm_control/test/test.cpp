@@ -13,12 +13,16 @@
 #include <iostream>
 #include <arm.h>
 #include <fstream>
+#include <string>
+#include <vector>
 
 using namespace KDL;
 using std::cin;
 using std::cout;
 using std::endl;
 using std::ofstream;
+using std::string;
+using std::vector;
 
 int main(int argc, char **argv)
 {
@@ -154,5 +158,49 @@ int main(int argc, char **argv)
     else
     {
         cout << "Failed to find required torques, error #" << error_val << endl;
+    }
+
+    // record required torques for a variety of joint positions
+    KDL::JntArray pos(arm.getArm().getNrOfJoints());
+    for (int joint = 0; joint < arm.getArm().getNrOfJoints(); ++joint)
+    {
+        pos(joint) = 0;
+    }
+
+    ofstream f("required_" + std::to_string(which_joint) + "_torque.txt");
+    for (double angle = -3.14159; angle < 3.14159; angle += 0.1)
+    {
+        pos(which_joint) = angle;
+        arm.calculateInverseDynamics(pos, vel, accel, ext_force, required_force);
+
+        f << angle << "," << required_force(0) << "," << required_force(1) << "," << required_force(2) << "," << required_force(3) << "," << required_force(4) << "," << required_force(5) << "\n";
+    }
+
+    // KDL::JntArray pos(arm.getArm().getNrOfJoints());
+    KDL::JntArray required_angles(arm.getArm().getNrOfJoints());
+
+    KDL::SetToZero(pos);
+    KDL::SetToZero(required_angles);
+
+    vector<KDL::Frame> desired_positions;
+    desired_positions.push_back(KDL::Frame(KDL::Vector(1, -0.5, 1)));
+    desired_positions.push_back(KDL::Frame(KDL::Vector(1, -0.4, 1)));
+    desired_positions.push_back(KDL::Frame(KDL::Vector(1, -0.3, 1)));
+    desired_positions.push_back(KDL::Frame(KDL::Vector(1, -0.2, 1)));
+    desired_positions.push_back(KDL::Frame(KDL::Vector(1, -0.1, 1)));
+    desired_positions.push_back(KDL::Frame(KDL::Vector(1, 0.0, 1)));
+    desired_positions.push_back(KDL::Frame(KDL::Vector(1, 0.1, 1)));
+    desired_positions.push_back(KDL::Frame(KDL::Vector(1, 0.2, 1)));
+    desired_positions.push_back(KDL::Frame(KDL::Vector(1, 0.3, 1)));
+    desired_positions.push_back(KDL::Frame(KDL::Vector(1, 0.4, 1)));
+    desired_positions.push_back(KDL::Frame(KDL::Vector(1, 0.5, 1)));
+
+    ofstream ik_f("inverse_kinematics.txt");
+    for (int state = 0; state < desired_positions.size(); ++state)
+    {
+        arm.calculateInverseKinematics(pos, desired_positions[state], required_angles);
+
+        ik_f << desired_positions[state].p.x() << "," << desired_positions[state].p.y() << "," << desired_positions[state].p.z() << ",";
+        ik_f << required_angles(0) << "," << required_angles(1) << "," << required_angles(2) << "," << required_angles(3) << "," << required_angles(4) << "," << required_angles(5) << "\n";
     }
 }

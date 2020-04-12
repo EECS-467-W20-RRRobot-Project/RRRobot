@@ -58,6 +58,15 @@ Arm::Arm(const std::string &sdf_file)
         const string name(link->Get<string>("name"));
         links[name].link_name = name;
 
+        // Transformation from world to link coordinates
+        stringstream frame_location(link->GetElement("pose")->GetValue()->GetAsString());
+        float x, y, z;
+        float roll, pitch, yaw;
+        frame_location >> x >> y >> z >> roll >> pitch >> yaw;
+        KDL::Rotation rotation = KDL::Rotation::RPY(roll, pitch, yaw);
+        KDL::Vector link_position(x, y, z);
+        links[name].link_frame = KDL::Frame(rotation, link_position);
+
         const sdf::ElementPtr inertial_data = link->GetElement("inertial");
         float mass = inertial_data->Get<float>("mass");
         links[name].mass = mass;
@@ -65,7 +74,8 @@ Arm::Arm(const std::string &sdf_file)
 
         // Get the center of mass for this link
         stringstream inertial_data_ss(inertial_data->GetElement("pose")->GetValue()->GetAsString());
-        inertial_data_ss >> links[name].com_location.data[0] >> links[name].com_location.data[1] >> links[name].com_location[2];
+        inertial_data_ss >> links[name].com_location[0] >> links[name].com_location[1] >> links[name].com_location[2];
+        links[name].com_location += links[name].link_frame.p;
 
         const sdf::ElementPtr inertia = inertial_data->GetElement("inertia");
         links[name].rotational_inertia = KDL::RotationalInertia(
@@ -75,15 +85,6 @@ Arm::Arm(const std::string &sdf_file)
             inertia->Get<float>("ixy"),
             inertia->Get<float>("ixz"),
             inertia->Get<float>("iyz"));
-
-        // Transformation from world to link coordinates
-        stringstream frame_location(link->GetElement("pose")->GetValue()->GetAsString());
-        float x, y, z;
-        float roll, pitch, yaw;
-        frame_location >> x >> y >> z >> roll >> pitch >> yaw;
-        KDL::Rotation rotation = KDL::Rotation::RPY(roll, pitch, yaw);
-        KDL::Vector link_position(x, y, z);
-        links[name].link_frame = KDL::Frame(rotation, link_position);
 
         link = link->GetNextElement("link");
     }
@@ -146,6 +147,7 @@ Arm::Arm(const std::string &sdf_file)
         KDL::Frame prev_frame_inverse = prev_frame.Inverse();
         KDL::Frame joint_relative_to_prev = prev_frame.Inverse() * joint_in_world;
 
+        KDL::Vector com_in_prev = joint_relative_to_prev * links[cur_link_name].com_location;
         // // EXPERIMENTAL - update rotation axis
         // KDL::Vector uncorrected_axis(0, 0, 0);
 
@@ -184,7 +186,7 @@ Arm::Arm(const std::string &sdf_file)
         // // END EXPERIMENTAL
 
         KDL::Joint::JointType next(links[cur_link_name].joint.getType());
-        KDL::RigidBodyInertia inertia(links[cur_link_name].mass, links[cur_link_name].com_location, links[cur_link_name].rotational_inertia);
+        KDL::RigidBodyInertia inertia(links[cur_link_name].mass, com_in_prev /*links[cur_link_name].com_location*/, links[cur_link_name].rotational_inertia);
         KDL::Segment to_add(links[cur_link_name].link_name, KDL::Joint(links[cur_link_name].joint.getName(), to_set), joint_relative_to_prev, inertia);
         to_set = next;
 
@@ -307,6 +309,9 @@ void Arm::print() const
         cout << seg.getName() << endl;
         cout << seg.getFrameToTip() << endl;
         cout << seg.getJoint().getTypeName() << endl;
+        cout << "Inertial frame:" << endl;
+        cout << "\tmass: " << seg.getInertia().getMass() << endl;
+        cout << '\t' << seg.getInertia().getCOG() << endl;
         cout << endl;
     }
 }

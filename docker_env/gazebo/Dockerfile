@@ -17,6 +17,7 @@ RUN echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
 RUN apt install -y python-rosdep
 RUN rosdep init
 RUN rosdep update
+RUN apt-get install -y ros-melodic-pid
 # user id 1000 should be the same as the host user, so that you can access files
 # from inside the docker container and also on the host
 RUN useradd -u 1000 rrrobot

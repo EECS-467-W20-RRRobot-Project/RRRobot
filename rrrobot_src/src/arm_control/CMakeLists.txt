@@ -149,6 +149,9 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_node src/arm_controller.cpp src/arm.cpp)
 add_executable(test test/test.cpp src/arm.cpp)
+add_executable(arm_movement_demo test/arm_movement_demo.cpp src/arm.cpp)
+add_executable(pub_sub test/test_pub_sub.cpp)
+add_executable(angles_subscriber test/angles_subscriber.cpp src/arm.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -170,6 +173,30 @@ target_link_libraries(${PROJECT_NAME}_node
 )
 
 target_link_libraries(test
+  ${catkin_LIBRARIES}
+  ${kdl_parser_LIBRARIES}
+  ${orocos_kdl_LIBRARIES}
+  ${SDF_LIBRARIES}
+  ignition-math4::ignition-math4
+)
+
+target_link_libraries(arm_movement_demo
+  ${catkin_LIBRARIES}
+  ${kdl_parser_LIBRARIES}
+  ${orocos_kdl_LIBRARIES}
+  ${SDF_LIBRARIES}
+  ignition-math4::ignition-math4
+)
+
+target_link_libraries(pub_sub
+  ${catkin_LIBRARIES}
+  ${kdl_parser_LIBRARIES}
+  ${orocos_kdl_LIBRARIES}
+  ${SDF_LIBRARIES}
+  ignition-math4::ignition-math4
+)
+
+target_link_libraries(angles_subscriber
   ${catkin_LIBRARIES}
   ${kdl_parser_LIBRARIES}
   ${orocos_kdl_LIBRARIES}
