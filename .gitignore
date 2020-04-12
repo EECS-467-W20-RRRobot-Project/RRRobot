@@ -1,9 +1,9 @@
 # Don't track the content of these folders #
 ############################################
 rrrobot_src/lib/
-rrrobot_src/src/simulation_drivers/build
-rrrobot_src/src/simulation_drivers/devel
-rrrobot_src/src/simulation_drivers/install
+rrrobot_src/*/build
+rrrobot_src/*/devel
+rrrobot_src/*/install
 .*
 !.gitignore
 
