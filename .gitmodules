@@ -1,0 +1,3 @@
+[submodule "rrrobot_src/warehouse/src/ariac"]
+	path = rrrobot_src/warehouse/src/ariac
+	url = https://github.com/osrf/ariac-gazebo_ros_pkgs.git
