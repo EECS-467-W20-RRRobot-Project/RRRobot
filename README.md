@@ -8,8 +8,8 @@
   - [Docker Compose Services](#docker-compose-services)
   - [GUI Support](#gui-support)
   - [Running Docker Containers](#running-docker-containers)
-  - [Building the simulation environment](#building-the-simulation-environment)
-  - [Running the simulation](#running-the-simulation)
+  - [Warehouse Simulation](#warehouse-simulation)
+  - [Gazebo Grasping Simulation](#gazebo-grasping-simulation)
 
 ## Contributors
 
@@ -100,18 +100,40 @@ Additionally, be sure to update the `IP_ADDRESS` variable in [.env](src/.env) wi
 4. Use Docker Compose to run a service (refer to [docker-compose.yml](src/docker-compose.yml) or [Docker Compose Services](#docker-compose-services))
    - `docker-compose run --rm <service_name>`
 
-### Building the simulation environment
+### Warehouse Simulation
+
+1. Clone repo
+   - HTTPS: `git clone https://github.com/EECS-467-W20-RRRobot-Project/RRRobot.git`
+   - SSH: `git clone git@github.com:EECS-467-W20-RRRobot-Project/RRRobot.git`
+2. Go to `RRRobot` folder
+   - `cd /PATH/TO/RRRobot`
+3. Get submodule(s)
+   - `git submodule init`
+4. Go to `docker_env` folder
+     - `cd /PATH/TO/RRRobot/docker_env`
+5. Start gazebo docker container
+   - `docker-compose run --rm warehouse`
+6. Source ROS Setup
+   - `source /opt/ros/melodic/setup.bash`
+7. Go to warehouse folder in container
+   - `cd /app/rrrobot_src/warehouse`
+8. Build package
+   - `catkin_make clean`
+   - `catkin_make`
+   - `catkin_make install`
+   - `source devel/setup.bash`
+9. Run sample environment
+   - `roslaunch osrf_gear sample_environment.launch`
+
+### Gazebo Grasping Simulation
 
 1. Source ROS Setup
    - `source /opt/ros/melodic/setup.bash`
 2. Build the drivers for the simulation
    - `cd /app/rrrobot_src/src/simulation_drivers/`
    - `source build.sh`
-
-### Running the simulation
-
-1. Start ros master node
+3. Start ros master node
    - `roscore &`
-2. Run the gazebo simulator - this will bring up gazebo with a robotic arm
+4. Run the gazebo simulator - this will bring up gazebo with a robotic arm
    - `gazebo /app/rrrobot_src/world/rrrobot.world`
-3. Run control and perception programs
+5. Run control and perception programs

@@ -70,3 +70,19 @@ services:
         hostname: "rrrobot-env"
         networks:
             - ros
+    
+    # Warehouse Production Service
+    warehouse:
+        # Use Dockerfile in warehouse folder
+        build: ./warehouse
+        # Mount warehouse folder on host to app folder in container
+        volumes:
+            - ../rrrobot_src:/app/rrrobot_src
+        # Set DISPLAY variable and network mode for GUIs
+        environment:
+            - DISPLAY=${IP_ADDRESS}:0.0
+        # Set working directory in container to app folder
+        # working_dir: /home/rrrobot
+        hostname: "rrrobot-env"
+        networks:
+            - ros
