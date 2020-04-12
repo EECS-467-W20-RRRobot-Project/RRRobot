@@ -102,27 +102,19 @@ Additionally, be sure to update the `IP_ADDRESS` variable in [.env](src/.env) wi
 
 ### Warehouse Simulation
 
-1. Clone repo
-   - HTTPS: `git clone https://github.com/EECS-467-W20-RRRobot-Project/RRRobot.git`
-   - SSH: `git clone git@github.com:EECS-467-W20-RRRobot-Project/RRRobot.git`
-2. Go to `RRRobot` folder
-   - `cd /PATH/TO/RRRobot`
-3. Get submodule(s)
-   - `git submodule init`
-4. Go to `docker_env` folder
+1. Go to `docker_env` folder
      - `cd /PATH/TO/RRRobot/docker_env`
-5. Start gazebo docker container
+2. Start gazebo docker container
    - `docker-compose run --rm warehouse`
-6. Source ROS Setup
+3. Source ROS Setup
    - `source /opt/ros/melodic/setup.bash`
-7. Go to warehouse folder in container
+4. Go to warehouse folder in container
    - `cd /app/rrrobot_src/warehouse`
-8. Build package
+5. Build package
    - `catkin_make clean`
    - `catkin_make`
    - `catkin_make install`
-   - `source devel/setup.bash`
-9. Run sample environment
+6. Run sample environment
    - `roslaunch osrf_gear sample_environment.launch`
 
 ### Gazebo Grasping Simulation

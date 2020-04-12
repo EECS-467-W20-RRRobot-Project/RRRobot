@@ -36,14 +36,15 @@ RUN echo "export GAZEBO_PLUGIN_PATH=/home/rrrobot/rrrobot_src/lib:\$GAZEBO_PLUGI
 
 USER rrrobot
 
+# Install Gazebo Environment for Agile Robotics (GEAR)
 RUN sudo apt-get update && \
     sudo apt-get install -y \
         wget
 
 RUN sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable bionic main" > /etc/apt/sources.list.d/gazebo-stable.list' && \
     wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add - && \
-    apt-get update && \
-    apt-get install -y \
+    sudo apt-get update && \
+    sudo apt-get install -y \
         ariac3
 
 CMD ["/bin/bash"]
