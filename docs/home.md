@@ -8,8 +8,9 @@
   - [Docker Compose Services](#docker-compose-services)
   - [GUI Support](#gui-support)
   - [Running Docker Containers](#running-docker-containers)
-  - [Warehouse Simulation](#warehouse-simulation)
   - [Gazebo Grasping Simulation](#gazebo-grasping-simulation)
+  - [GEAR Simulation](#gear-simulation)
+  - [Tips & Tricks](#tips--tricks)
 
 ## Contributors
 
@@ -30,6 +31,7 @@
 
 1. [Project Poster](1.%20Project%20Poster.pdf)
 2. [Project Proposal](2.%20Project%20Proposal.pdf)
+3. [Final Project - Overleaf (Read-Only)](https://www.overleaf.com/read/ncvksrzpvbmr)
 
 ## Introduction
 
@@ -58,6 +60,10 @@ ros is the production container for all ROS nodes we create. This is meant to ru
 #### gazebo <!-- omit in toc -->
 
 Similarly to ros, gazebo is the production container for gazebo. This is meant to run our final simulation.
+
+#### gear <!-- omit in toc -->
+
+The GEAR container includes the Gazebo Environment for Agile Robotics from the Agile Robotics for Industrial Automation Competition 2019.
 
 ### GUI Support
 
@@ -100,23 +106,6 @@ Additionally, be sure to update the `IP_ADDRESS` variable in [.env](src/.env) wi
 4. Use Docker Compose to run a service (refer to [docker-compose.yml](src/docker-compose.yml) or [Docker Compose Services](#docker-compose-services))
    - `docker-compose run --rm <service_name>`
 
-### Warehouse Simulation
-
-1. Go to `docker_env` folder
-     - `cd /PATH/TO/RRRobot/docker_env`
-2. Start gazebo docker container
-   - `docker-compose run --rm warehouse`
-3. Source ROS Setup
-   - `source /opt/ros/melodic/setup.bash`
-4. Go to warehouse folder in container
-   - `cd /app/rrrobot_src/warehouse`
-5. Build package
-   - `catkin_make clean`
-   - `catkin_make`
-   - `catkin_make install`
-6. Run sample environment
-   - `roslaunch osrf_gear sample_environment.launch`
-
 ### Gazebo Grasping Simulation
 
 1. Source ROS Setup
@@ -129,3 +118,16 @@ Additionally, be sure to update the `IP_ADDRESS` variable in [.env](src/.env) wi
 4. Run the gazebo simulator - this will bring up gazebo with a robotic arm
    - `gazebo /app/rrrobot_src/world/rrrobot.world`
 5. Run control and perception programs
+
+### GEAR Simulation
+
+Instructions for working in the GEAR Simulation can be found on the [GEAR](gear.md) page.
+
+### Tips & Tricks
+
+- Clear space on docker machine
+  - `docker system prune --volumes`
+- See running containers
+  - `docker ps`
+- Attach a new terminal to a running container
+  - `docker exec -it <container> bash`

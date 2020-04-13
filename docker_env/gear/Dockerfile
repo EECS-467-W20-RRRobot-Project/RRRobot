@@ -1,4 +1,4 @@
-# Warehouse Dockerfile
+# GEAR Dockerfile
 
 # Use official image for Gazebo 9.x 
 FROM gazebo:gzserver9
