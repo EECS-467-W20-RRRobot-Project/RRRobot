@@ -53,8 +53,6 @@ Arm::Arm(const std::string &sdf_file)
     sdf::ElementPtr link = model->GetElement("link");
     while (link)
     {
-        // cout << "Link: " << link->Get<string>("name") << endl;
-
         const string name(link->Get<string>("name"));
         links[name].link_name = name;
 
@@ -70,7 +68,6 @@ Arm::Arm(const std::string &sdf_file)
         const sdf::ElementPtr inertial_data = link->GetElement("inertial");
         float mass = inertial_data->Get<float>("mass");
         links[name].mass = mass;
-        // cout << "Mass: " << mass << endl;
 
         // Get the center of mass for this link
         stringstream inertial_data_ss(inertial_data->GetElement("pose")->GetValue()->GetAsString());
@@ -120,7 +117,7 @@ Arm::Arm(const std::string &sdf_file)
         else if (axis_num == 2)
             joint_type = KDL::Joint::JointType::RotZ;
 
-        links[child].joint = KDL::Joint(name, joint_type); // correct
+        links[child].joint = KDL::Joint(name, joint_type);
 
         stringstream pose_string(joint->GetElement("pose")->GetValue()->GetAsString());
         float x, y, z;
@@ -129,7 +126,7 @@ Arm::Arm(const std::string &sdf_file)
 
         KDL::Rotation frame_rotation = KDL::Rotation::RPY(roll, pitch, yaw);
         KDL::Vector frame_location(x, y, z);
-        links[child].joint_frame = KDL::Frame(frame_rotation, frame_location); // incorrect --> this is actually the
+        links[child].joint_frame = KDL::Frame(frame_rotation, frame_location);
 
         joint = joint->GetNextElement("joint");
     }
@@ -148,59 +145,11 @@ Arm::Arm(const std::string &sdf_file)
         KDL::Frame joint_relative_to_prev = prev_frame.Inverse() * joint_in_world;
 
         KDL::Vector com_in_prev = joint_relative_to_prev * links[cur_link_name].com_location;
-        // // EXPERIMENTAL - update rotation axis
-        // KDL::Vector uncorrected_axis(0, 0, 0);
-
-        // if (links[cur_link_name].joint.getType() == KDL::Joint::JointType::RotX)
-        // {
-        //     uncorrected_axis = KDL::Vector(1, 0, 0);
-        // }
-        // else if (links[cur_link_name].joint.getType() == KDL::Joint::JointType::RotY)
-        // {
-        //     uncorrected_axis = KDL::Vector(0, 1, 0);
-        // }
-        // else if (links[cur_link_name].joint.getType() == KDL::Joint::JointType::RotZ)
-        // {
-        //     uncorrected_axis = KDL::Vector(0, 0, 1);
-        // }
-
-        // KDL::Vector corrected_axis = joint_relative_to_prev.M * uncorrected_axis;
-
-        // double x = fabs(corrected_axis.x());
-        // double y = fabs(corrected_axis.y());
-        // double z = fabs(corrected_axis.z());
-
-        // const string &name(links[cur_link_name].joint.getName());
-        // if (x > y and x > z)
-        // {
-        //     links[cur_link_name].joint = KDL::Joint(name, KDL::Joint::JointType::RotX);
-        // }
-        // else if (y > x and y > z)
-        // {
-        //     links[cur_link_name].joint = KDL::Joint(name, KDL::Joint::JointType::RotY);
-        // }
-        // else if (z > x and z > y)
-        // {
-        //     links[cur_link_name].joint = KDL::Joint(name, KDL::Joint::JointType::RotZ);
-        // }
-        // // END EXPERIMENTAL
 
         KDL::Joint::JointType next(links[cur_link_name].joint.getType());
         KDL::RigidBodyInertia inertia(links[cur_link_name].mass, com_in_prev /*links[cur_link_name].com_location*/, links[cur_link_name].rotational_inertia);
         KDL::Segment to_add(links[cur_link_name].link_name, KDL::Joint(links[cur_link_name].joint.getName(), to_set), joint_relative_to_prev, inertia);
         to_set = next;
-
-        // cout << cur_link_name << endl;
-
-        double roll, pitch, yaw;
-        // cout << "  joint in world coordinates:" << endl;
-        // cout << joint_in_world << endl;
-        // cout << "  joint in previous joint's frame:" << endl;
-        // cout << joint_relative_to_prev << endl;
-        // cout << "  previous frame inverse:" << endl;
-        // cout << prev_frame_inverse << endl;
-        // cout << "Joint type: " << links[cur_link_name].joint.getTypeName() << "\n\n"
-        //      << endl;
 
         arm.addSegment(to_add);
 
@@ -213,64 +162,6 @@ Arm::Arm(const std::string &sdf_file)
     fksolver.reset(new KDL::ChainFkSolverPos_recursive(arm));
     iksolver.reset(new KDL::ChainIkSolverPos_LMA(arm));
     idsolver.reset(new KDL::ChainIdSolver_RNE(arm, KDL::Vector(0, 0, -9.81)));
-}
-
-/*
- * Gets the center of mass of the remaining arm, starting from the
- * link in index (ie the center of mass of links l[i]-l[n])
- */
-KDL::Vector Arm::getCOM(size_t index)
-{
-}
-
-/*
- * Gets the center of mass of the remaining arm, starting from the
- * link named 'link_name'
- */
-KDL::Vector Arm::getCOM(const std::string &link_name)
-{
-}
-
-/*
- * Gets the inertia of the remaining arm about the joint in index. This
- * treats the preceding segments as if they are stationary and calculates
- * the inertia of the remaining arm.
- */
-float Arm::getInertia(size_t index)
-{
-}
-
-/*
- * Gets the inertia of the remaining arm about the joint named 'joint_name'. This
- * treats the preceding segments as if they are stationary and calculates
- * the inertia of the remaining arm.
- */
-float Arm::getInertia(const std::string &joint_name)
-{
-}
-
-/*
- * This returns the mass of the remaining links, starting from (and including)
- * the link at index
- */
-float Arm::getSupportedMass(size_t index)
-{
-}
-
-/*
- * This returns the mass of the remaining links, starting from (and including)
- * the link named 'link_name'
- */
-float Arm::getSupportedMass(const std::string &link_name)
-{
-}
-
-/*
- * This returns the torques required to get the arm moving with the desired 
- * angular acceleration.
- */
-std::vector<float> Arm::getRequiredTorques(/*std::vector<float> theta_des, std::vector<float> theta_dot_des, */ std::vector<float> theta_double_dot_des)
-{
 }
 
 /*
@@ -289,11 +180,6 @@ bool Arm::calculateInverseKinematics(const KDL::JntArray &cur_configuration, con
 
 int Arm::calculateInverseDynamics(const KDL::JntArray &pos, const KDL::JntArray &vel, const KDL::JntArray &accel, const KDL::Wrenches &f_external, KDL::JntArray &required_torque)
 {
-    // cout << pos.rows() << endl;
-    // cout << vel.rows() << endl;
-    // cout << accel.rows() << endl;
-    // cout << f_external.size() << endl;
-    // cout << required_torque.rows() << endl;
     return idsolver->CartToJnt(pos, vel, accel, f_external, required_torque);
 }
 
@@ -314,13 +200,4 @@ void Arm::print() const
         cout << '\t' << seg.getInertia().getCOG() << endl;
         cout << endl;
     }
-}
-
-/*
- * i_com: the inertia about the center of mass of this link
- * mass: the mass of this link
- * distance: the distance from the center of mass to the new axis
- */
-float Arm::parallelAxisTheorem(float i_com, float mass, float distance)
-{
 }

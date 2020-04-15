@@ -10,6 +10,7 @@ add_compile_options(-std=c++11;-g3)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  geometry_msgs
 )
 
 ## System dependencies are found with CMake's conventions
