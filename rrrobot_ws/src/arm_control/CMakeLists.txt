@@ -129,7 +129,7 @@ include_directories(
   /usr/include/bullet
   /usr/include/sdformat-6.2
   /usr/include/ignition/math4
-  /home/rrrobot/rrrobot_src/devel/include/
+  /home/rrrobot/rrrobot_ws/devel/include/
 )
 include_directories(
   /usr/include/eigen3
@@ -162,7 +162,7 @@ add_executable(angles_subscriber test/angles_subscriber.cpp src/arm.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp simulation_env_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node

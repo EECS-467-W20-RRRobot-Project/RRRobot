@@ -31,8 +31,8 @@ RUN chown -R rrrobot:rrrobot /home/rrrobot
 # Initialize the environment in .bashrc
 RUN echo "source /opt/ros/melodic/setup.bash" >> /home/rrrobot/.bashrc
 RUN echo "source /usr/share/gazebo/setup.sh" >> /home/rrrobot/.bashrc
-RUN echo "export GAZEBO_MODEL_PATH=/home/rrrobot/rrrobot_src/src/gazebo_models:\$GAZEBO_MODEL_PATH" >> /home/rrrobot/.bashrc
-RUN echo "export GAZEBO_PLUGIN_PATH=/home/rrrobot/rrrobot_src/lib:\$GAZEBO_PLUGIN_PATH" >> /home/rrrobot/.bashrc
+RUN echo "export GAZEBO_MODEL_PATH=/home/rrrobot/rrrobot_ws/src/gazebo_models:\$GAZEBO_MODEL_PATH" >> /home/rrrobot/.bashrc
+RUN echo "export GAZEBO_PLUGIN_PATH=/opt/ros/melodic/lib:/home/rrrobot/rrrobot_ws/lib:\$GAZEBO_PLUGIN_PATH" >> /home/rrrobot/.bashrc
 
 USER rrrobot
 
