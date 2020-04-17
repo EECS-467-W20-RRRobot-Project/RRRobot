@@ -17,7 +17,7 @@
       </inertial>
       <self_collide>1</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
+      <gravity>0</gravity>
       <visual name='visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
@@ -116,7 +116,7 @@
       </inertial>
       <self_collide>1</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
+      <gravity>0</gravity>
       <visual name='visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
@@ -215,7 +215,7 @@
       </inertial>
       <self_collide>1</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
+      <gravity>0</gravity>
       <visual name='visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
@@ -314,7 +314,7 @@
       </inertial>
       <self_collide>1</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
+      <gravity>0</gravity>
       <visual name='visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
@@ -413,7 +413,7 @@
       </inertial>
       <self_collide>1</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
+      <gravity>0</gravity>
       <visual name='visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
@@ -512,7 +512,7 @@
       </inertial>
       <self_collide>1</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
+      <gravity>0</gravity>
       <visual name='visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
@@ -611,7 +611,7 @@
       </inertial>
       <self_collide>1</self_collide>
       <kinematic>0</kinematic>
-      <gravity>1</gravity>
+      <gravity>0</gravity>
       <visual name='visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
@@ -704,7 +704,7 @@
         <limit>
           <lower>-1.79769e+308</lower>
           <upper>1.79769e+308</upper>
-          <effort>-2000</effort>
+          <effort>-20000000</effort>
           <velocity>-1</velocity>
         </limit>
         <dynamics>
@@ -737,7 +737,7 @@
         <limit>
           <lower>-1.79769e+308</lower>
           <upper>1.79769e+308</upper>
-          <effort>-2000</effort>
+          <effort>-20000000</effort>
           <velocity>-1</velocity>
         </limit>
         <dynamics>
@@ -770,7 +770,7 @@
         <limit>
           <lower>-1.79769e+308</lower>
           <upper>1.79769e+308</upper>
-          <effort>-2000</effort>
+          <effort>-20000000</effort>
           <velocity>-1</velocity>
         </limit>
         <dynamics>
@@ -803,7 +803,7 @@
         <limit>
           <lower>-1.79769e+308</lower>
           <upper>1.79769e+308</upper>
-          <effort>-2000</effort>
+          <effort>-20000000</effort>
           <velocity>-1</velocity>
         </limit>
         <dynamics>
@@ -836,7 +836,7 @@
         <limit>
           <lower>-1.79769e+308</lower>
           <upper>1.79769e+308</upper>
-          <effort>-2000</effort>
+          <effort>-20000000</effort>
           <velocity>-1</velocity>
         </limit>
         <dynamics>
@@ -869,7 +869,7 @@
         <limit>
           <lower>-1.79769e+308</lower>
           <upper>1.79769e+308</upper>
-          <effort>-2000</effort>
+          <effort>-20000000</effort>
           <velocity>-1</velocity>
         </limit>
         <dynamics>

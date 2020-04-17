@@ -1,0 +1,123 @@
+<launch>
+    <node name="shoulder_pivot_pid" pkg="pid" type="controller" output="screen" >
+      <param name="Kp" value="450.0" />
+      <param name="Ki" value="5.0" />
+      <param name="Kd" value="600.0" />
+      <param name="upper_limit" value="10000" />
+      <param name="lower_limit" value="-10000" />
+      <param name="windup_limit" value="1000" />
+      <param name="cutoff_frequency" value="20" />
+      <param name="max_loop_frequency" value="105.0" />
+      <param name="min_loop_frequency" value="95.0" />
+      <param name="setpoint_timeout" value="-1.0" />
+      <param name="topic_from_controller" value="/arm_node/arm_commands/shoulder_pivot_torque" />
+      <param name="topic_from_plant" value="/arm_node/arm_positions/shoulder_pivot_angle" />
+      <param name="setpoint_topic" value="/arm_node/shoulder_pivot_setpoint" />
+    </node>
+
+    <node name="shoulder_joint_pid" pkg="pid" type="controller" output="screen" >
+      <param name="Kp" value="1200.0" />
+      <param name="Ki" value="40.0" />
+      <param name="Kd" value="1400.0" />
+      <param name="upper_limit" value="10000" />
+      <param name="lower_limit" value="-10000" />
+      <param name="windup_limit" value="1000" />
+      <param name="cutoff_frequency" value="20" />
+      <param name="max_loop_frequency" value="105.0" />
+      <param name="min_loop_frequency" value="95.0" />
+      <param name="setpoint_timeout" value="-1.0" />
+      <param name="topic_from_controller" value="/arm_node/arm_commands/shoulder_joint_torque" />
+      <param name="topic_from_plant" value="/arm_node/arm_positions/shoulder_joint_angle" />
+      <param name="setpoint_topic" value="/arm_node/shoulder_joint_setpoint" />
+    </node>
+
+    <node name="elbow_joint_pid" pkg="pid" type="controller" output="screen" >
+      <param name="Kp" value="400.0" />
+      <param name="Ki" value="15.0" />
+      <param name="Kd" value="400.0" />
+      <param name="upper_limit" value="10000" />
+      <param name="lower_limit" value="-10000" />
+      <param name="windup_limit" value="1000" />
+      <param name="cutoff_frequency" value="20" />
+      <param name="max_loop_frequency" value="105.0" />
+      <param name="min_loop_frequency" value="95.0" />
+      <param name="setpoint_timeout" value="-1.0" />
+      <param name="topic_from_controller" value="/arm_node/arm_commands/elbow_joint_torque" />
+      <param name="topic_from_plant" value="/arm_node/arm_positions/elbow_joint_angle" />
+      <param name="setpoint_topic" value="/arm_node/elbow_joint_setpoint" />
+    </node>
+
+    <node name="wrist_pivot_pid" pkg="pid" type="controller" output="screen" >
+      <param name="Kp" value="3.0" />
+      <param name="Ki" value="0.5" />
+      <param name="Kd" value="1.0" />
+      <param name="upper_limit" value="1000" />
+      <param name="lower_limit" value="-1000" />
+      <param name="windup_limit" value="100" />
+      <param name="cutoff_frequency" value="20" />
+      <param name="max_loop_frequency" value="105.0" />
+      <param name="min_loop_frequency" value="95.0" />
+      <param name="setpoint_timeout" value="-1.0" />
+      <param name="topic_from_controller" value="/arm_node/arm_commands/wrist_pivot_torque" />
+      <param name="topic_from_plant" value="/arm_node/arm_positions/wrist_pivot_angle" />
+      <param name="setpoint_topic" value="/arm_node/wrist_pivot_setpoint" />
+    </node>
+
+    <node name="wrist_joint_pid" pkg="pid" type="controller" output="screen" >
+      <param name="Kp" value="2.0" />
+      <param name="Ki" value="0.5" />
+      <param name="Kd" value="1.0" />
+      <param name="upper_limit" value="1000" />
+      <param name="lower_limit" value="-1000" />
+      <param name="windup_limit" value="100" />
+      <param name="cutoff_frequency" value="20" />
+      <param name="max_loop_frequency" value="105.0" />
+      <param name="min_loop_frequency" value="95.0" />
+      <param name="setpoint_timeout" value="-1.0" />
+      <param name="topic_from_controller" value="/arm_node/arm_commands/wrist_joint_torque" />
+      <param name="topic_from_plant" value="/arm_node/arm_positions/wrist_joint_angle" />
+      <param name="setpoint_topic" value="/arm_node/wrist_joint_setpoint" />
+    </node>
+
+    <node name="end_effector_pivot_pid" pkg="pid" type="controller" output="screen" >
+      <param name="Kp" value="0.1" />
+      <param name="Ki" value="0.01" />
+      <param name="Kd" value="0.05" />
+      <param name="upper_limit" value="1000" />
+      <param name="lower_limit" value="-1000" />
+      <param name="windup_limit" value="100" />
+      <param name="cutoff_frequency" value="20" />
+      <param name="max_loop_frequency" value="105.0" />
+      <param name="min_loop_frequency" value="95.0" />
+      <param name="setpoint_timeout" value="-1.0" />
+      <param name="topic_from_controller" value="/arm_node/arm_commands/end_effector_pivot_torque" />
+      <param name="topic_from_plant" value="/arm_node/arm_positions/end_effector_pivot_angle" />
+      <param name="setpoint_topic" value="/arm_node/end_effector_pivot_setpoint" />
+    </node>
+
+    <!-- <node name="servo_sim_node" pkg="pid" type="plant_sim" output="screen" >
+      <param name="plant_order" value="2" />
+    </node> -->
+
+    <node name="arm_controller" pkg="arm_control" type="arm_control_node" output="screen" />
+    <node name="arm_movement_demo" pkg="arm_control" type="arm_movement_demo" output="screen" />
+
+    <!-- rqt_plot is a resource hog, so if you're seeing high CPU usage, don't launch rqt_plot  -->
+    <!-- node name="rqt_plot" pkg="rqt_plot" type="rqt_plot"
+    args="/control_effort/data /state/data /setpoint/data" -->
+
+    <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" />
+
+    <!--node name="rqt_robot_monitor" pkg="rqt_robot_monitor" type="rqt_robot_monitor" -->
+
+    <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+      <arg name="world_name" value="rrrobot_setpoint.world"/> <!--Note: the world_name is with respect to GAZEBO_RESOURCE_PATH environmental variable -->
+      <arg name="paused" value="true"/>
+      <arg name="use_sim_time" value="true"/>
+      <arg name="gui" value="true"/>
+      <arg name="recording" value="false"/>
+      <arg name="debug" value="false"/>
+    </include>
+
+</launch>
