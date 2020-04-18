@@ -134,11 +134,16 @@ add_library(arm_motors SHARED
   src/arm_motors.cpp
 )
 
+add_library(insert_model SHARED
+  src/model_insertion_plugin.cpp
+)
+
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
 add_dependencies(arm_angles ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(arm_motors ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(insert_model ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
@@ -162,6 +167,11 @@ target_link_libraries(arm_angles
 )
 
 target_link_libraries(arm_motors
+  ${catkin_LIBRARIES}
+  ${GAZEBO_LIBRARIES}
+)
+
+target_link_libraries(insert_model
   ${catkin_LIBRARIES}
   ${GAZEBO_LIBRARIES}
 )
@@ -192,9 +202,9 @@ target_link_libraries(test_move_arm
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
-install(TARGETS arm_angles arm_motors
+install(TARGETS arm_angles arm_motors insert_model
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION /home/rrrobot/rrrobot_src/lib/
+  LIBRARY DESTINATION /home/rrrobot/rrrobot_ws/lib/
 #   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
 )
 

@@ -12,7 +12,9 @@
     </include>
 
     <include>
-      <uri>model://fanuc_robotic_arm</uri>
+      <uri>model://fanuc_robotic_arm_with_gripper</uri>
     </include>
+
+    <plugin name="insert_models" filename="libinsert_model.so"/>
   </world>
 </sdf>
