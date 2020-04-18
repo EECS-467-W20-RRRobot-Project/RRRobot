@@ -35,7 +35,7 @@ world_dir = os.path.join(rospack.get_path('osrf_gear'), 'worlds')
 launch_dir = os.path.join(rospack.get_path('osrf_gear'), 'launch')
 template_files = [
     #os.path.join(world_dir, 'gear.world.template'),
-    '/home/rrrobot/rrrobot_ws/world/gear.world.template',
+    '/app/rrrobot_ws/world/gear.world.template',
     os.path.join(launch_dir, 'gear.launch.template'),
     os.path.join(launch_dir, 'gear.urdf.xacro.template'),
 ]

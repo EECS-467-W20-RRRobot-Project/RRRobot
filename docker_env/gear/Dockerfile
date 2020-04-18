@@ -25,14 +25,15 @@ RUN passwd --delete rrrobot
 # add to sudo users
 RUN usermod -aG sudo rrrobot
 # set the entry point
-WORKDIR /home/rrrobot
+WORKDIR /app/rrrobot_ws
+RUN mkdir /home/rrrobot
 RUN chown -R rrrobot:rrrobot /home/rrrobot
 
 # Initialize the environment in .bashrc
 RUN echo "source /opt/ros/melodic/setup.bash" >> /home/rrrobot/.bashrc
 RUN echo "source /usr/share/gazebo/setup.sh" >> /home/rrrobot/.bashrc
-RUN echo "export GAZEBO_MODEL_PATH=/home/rrrobot/rrrobot_ws/src/gazebo_models:\$GAZEBO_MODEL_PATH" >> /home/rrrobot/.bashrc
-RUN echo "export GAZEBO_PLUGIN_PATH=/opt/ros/melodic/lib:/home/rrrobot/rrrobot_ws/lib:\$GAZEBO_PLUGIN_PATH" >> /home/rrrobot/.bashrc
+RUN echo "export GAZEBO_MODEL_PATH=/app/rrrobot_ws/src/gazebo_models:\$GAZEBO_MODEL_PATH" >> /home/rrrobot/.bashrc
+RUN echo "export GAZEBO_PLUGIN_PATH=/opt/ros/melodic/lib:/app/rrrobot_ws/lib:\$GAZEBO_PLUGIN_PATH" >> /home/rrrobot/.bashrc
 
 USER rrrobot
 
