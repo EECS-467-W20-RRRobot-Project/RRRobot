@@ -38,7 +38,32 @@ public:
     {
         std::cout << "Received message to load model: " << msg.data << std::endl;
 
-        parent->InsertModelFile(std::string("model://") + msg.data);
+        // Create a new transport node
+        transport::NodePtr node(new transport::Node());
+
+        // Initialize the node with the world name
+        node->Init(parent->Name());
+
+        // Create a publisher on the ~/factory topic
+        transport::PublisherPtr factoryPub =
+            node->Advertise<msgs::Factory>("~/factory");
+
+        // Create the message
+        msgs::Factory to_pub;
+
+        // Model file to load
+        to_pub.set_sdf_filename(std::string("model://") + msg.data);
+
+        // Pose to initialize the model to
+        msgs::Set(to_pub.mutable_pose(),
+                  ignition::math::Pose3d(
+                      ignition::math::Vector3d(2, 0, 0),
+                      ignition::math::Quaterniond(0, 0, 0)));
+
+        // Send the message
+        factoryPub->Publish(to_pub);
+
+        // parent->InsertModelFile(std::string("model://") + msg.data);
     }
 
 private:
