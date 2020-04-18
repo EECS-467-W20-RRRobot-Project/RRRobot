@@ -9,7 +9,7 @@ using std::endl;
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "inert_models");
+    ros::init(argc, argv, "insert_models");
 
     ros::NodeHandle nh;
 
