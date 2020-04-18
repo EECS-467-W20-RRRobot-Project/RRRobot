@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>rrrobot</name>
+    <version>0.1.0</version>
+    <description>RRRobot package</description>
+    <maintainer email="balajsra@umich.edu">Sravan Balaji</maintainer>
+    <maintainer email="chenxgu@umich.edu">Chenxi Gu</maintainer>
+    <maintainer email="thejakej@umich.edu">Jake Johnson</maintainer>
+    <maintainer email="dwitcpa@umich.edu">Derek Witcpalek</maintainer>
+
+    <license>MIT</license>
+
+    <buildtool_depend>catkin</buildtool_depend>
+
+    <depend>osrf_gear</depend>
+    <depend>roscpp</depend>
+    <depend>sensor_msgs</depend>
+    <depend>std_srvs</depend>
+    <depend>tf2_geometry_msgs</depend>
+    <depend>trajectory_msgs</depend>
+    <depend>std_msgs</depend>
+    <depend>geometry_msgs</depend>
+    <depend>gazebo_ros</depend>
+    <depend>message_generation</depend>
+    <exec_depend>message_runtime</exec_depend>
+
+</package>
