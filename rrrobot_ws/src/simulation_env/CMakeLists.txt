@@ -10,6 +10,7 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  geometry_msgs
   gazebo_ros
   message_generation
 )
@@ -53,6 +54,7 @@ add_message_files(
   FILES
   arm_angles.msg
   arm_command.msg
+  model_insertion.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -73,6 +75,7 @@ add_message_files(
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
 )
 
 ################################################
@@ -107,7 +110,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES simulation_env
-  CATKIN_DEPENDS roscpp std_msgs gazebo_ros
+  CATKIN_DEPENDS roscpp std_msgs geometry_msgs gazebo_ros
 #  DEPENDS system_lib
 )
 
@@ -122,6 +125,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${roscpp_INCLUDE_DIRS}
   ${std_msgs_INCLUDE_DIRS}
+  ${geometry_msgs_INCLUDE_DIRS}
   ${GAZEBO_INCLUDE_DIRS}
 )
 
@@ -149,6 +153,7 @@ add_dependencies(insert_model ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPOR
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(test_move_arm test/move_arm.cpp)
+add_executable(test_insert_object test/test_insert_object.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -159,6 +164,7 @@ add_executable(test_move_arm test/move_arm.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 add_dependencies(test_move_arm arm_angles arm_motors)
+add_dependencies(test_insert_object insert_model)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(arm_angles
@@ -177,6 +183,10 @@ target_link_libraries(insert_model
 )
 
 target_link_libraries(test_move_arm
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(test_insert_object
   ${catkin_LIBRARIES}
 )
 

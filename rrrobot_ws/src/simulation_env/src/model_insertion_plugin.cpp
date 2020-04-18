@@ -5,6 +5,7 @@
 
 #include "ros/ros.h"
 #include <std_msgs/String.h>
+#include "simulation_env/model_insertion.h"
 
 #include <string>
 #include <memory>
@@ -34,9 +35,9 @@ public:
         subscriber = nh->subscribe("object_to_load", 1000, &ModelInsertion::insertModel, this);
     }
 
-    void insertModel(const std_msgs::String &msg)
+    void insertModel(const simulation_env::model_insertion &msg)
     {
-        std::cout << "Received message to load model: " << msg.data << std::endl;
+        std::cout << "Received message to load model: " << msg.model_name << std::endl;
 
         // Create a new transport node
         transport::NodePtr node(new transport::Node());
@@ -52,13 +53,13 @@ public:
         msgs::Factory to_pub;
 
         // Model file to load
-        to_pub.set_sdf_filename(std::string("model://") + msg.data);
+        to_pub.set_sdf_filename(std::string("model://") + msg.model_name);
 
         // Pose to initialize the model to
         msgs::Set(to_pub.mutable_pose(),
                   ignition::math::Pose3d(
-                      ignition::math::Vector3d(2, 0, 0),
-                      ignition::math::Quaterniond(0, 0, 0)));
+                      ignition::math::Vector3d(msg.pose.position.x, msg.pose.position.y, msg.pose.position.z),
+                      ignition::math::Quaterniond(msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w)));
 
         // Send the message
         factoryPub->Publish(to_pub);
