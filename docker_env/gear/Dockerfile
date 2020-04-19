@@ -33,7 +33,7 @@ RUN chown -R rrrobot:rrrobot /home/rrrobot
 RUN echo "source /opt/ros/melodic/setup.bash" >> /home/rrrobot/.bashrc
 RUN echo "source /usr/share/gazebo/setup.sh" >> /home/rrrobot/.bashrc
 RUN echo "export GAZEBO_MODEL_PATH=/app/rrrobot_ws/src/gazebo_models:\$GAZEBO_MODEL_PATH" >> /home/rrrobot/.bashrc
-RUN echo "export GAZEBO_PLUGIN_PATH=/opt/ros/melodic/lib:/app/rrrobot_ws/lib:\$GAZEBO_PLUGIN_PATH" >> /home/rrrobot/.bashrc
+RUN echo "export GAZEBO_PLUGIN_PATH=/opt/ros/melodic/lib:/app/rrrobot_ws/devel/lib:\$GAZEBO_PLUGIN_PATH" >> /home/rrrobot/.bashrc
 
 USER rrrobot
 
@@ -47,5 +47,27 @@ RUN sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable
     sudo apt-get update && \
     sudo apt-get install -y \
         ariac3
+
+# CV Model Dependencies
+RUN sudo apt-get update && \
+    sudo apt-get install -y \
+        python3-pip
+
+RUN pip3 install -U \
+        numpy \
+        torch \
+        torchvision \
+        Pillow
+
+# MoveIt Dependencies
+RUN sudo apt-get update && \
+    sudo apt-get install -y \
+        ros-melodic-moveit-core \
+        ros-melodic-moveit-kinematics \
+        ros-melodic-moveit-ros-planning \
+        ros-melodic-moveit-ros-move-group \
+        ros-melodic-moveit-planners-ompl \
+        ros-melodic-moveit-ros-visualization \
+        ros-melodic-moveit-simple-controller-manager
 
 CMD ["/bin/bash"]
