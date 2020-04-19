@@ -1,2 +1,3 @@
 square_trash_can,unit_box/image.jpg,plastic
 unit_box,unit_box/image.jpg,plastic
+plastic_bottle,plastic_bottle/image.jpg,plastic
