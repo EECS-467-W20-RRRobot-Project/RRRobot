@@ -18,8 +18,13 @@ int main(int argc, char **argv)
     while (ros::ok())
     {
         rrrobot::model_insertion msg;
-        cout << "Enter the model name: ";
+        cout << "Enter the model name (or 'q' to quit): ";
         cin >> msg.model_name;
+
+        if (msg.model_name == "q") {
+            return 0;
+        }
+
         cout << "Enter the pose: " << endl;
         cout << "x: ";
         cin >> msg.pose.position.x;

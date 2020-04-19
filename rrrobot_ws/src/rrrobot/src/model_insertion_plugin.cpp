@@ -20,9 +20,7 @@ public:
     {
         std::cout << "Loading model insertion plugin" << std::endl;
 
-        // Option 1: Insert model from file via function call.
-        // The filename must be in the GAZEBO_MODEL_PATH environment variable.
-        parent = _parent; //->InsertModelFile("model://box");
+        parent = _parent;
 
         if (!ros::isInitialized())
         {
@@ -63,8 +61,6 @@ public:
 
         // Send the message
         factoryPub->Publish(to_pub);
-
-        // parent->InsertModelFile(std::string("model://") + msg.data);
     }
 
 private:

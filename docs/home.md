@@ -130,4 +130,4 @@ Instructions for working in the GEAR Simulation can be found on the [GEAR](gear.
 - See running containers
   - `docker ps`
 - Attach a new terminal to a running container
-  - `docker exec -it <container> bash`
+  - `docker exec -it -u root <container> bash`
