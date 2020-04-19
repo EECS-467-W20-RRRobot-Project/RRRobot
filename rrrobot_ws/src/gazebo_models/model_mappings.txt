@@ -1,0 +1,2 @@
+square_trash_can,unit_box/image.jpg,plastic
+unit_box,unit_box/image.jpg,plastic

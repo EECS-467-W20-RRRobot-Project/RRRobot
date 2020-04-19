@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rrrobot)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 find_package(catkin REQUIRED COMPONENTS
   osrf_gear
   roscpp
@@ -62,8 +64,15 @@ add_dependencies(rrrobot_node ${catkin_EXPORTED_TARGETS})
 target_link_libraries(rrrobot_node ${catkin_LIBRARIES})
 
 add_executable(test_insert_object test/test_insert_object.cpp)
+add_executable(object_spawner_node src/object_spawner_node.cpp)
+
 add_dependencies(test_insert_object insert_model)
+add_dependencies(object_spawner_node insert_model)
+
 target_link_libraries(test_insert_object
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(object_spawner_node
   ${catkin_LIBRARIES}
 )
 
