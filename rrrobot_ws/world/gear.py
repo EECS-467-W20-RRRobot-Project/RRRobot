@@ -57,22 +57,22 @@ arm_configs = {
             'wrist_3_joint': 0,
         }
     },
-    'arm2': {
-        'arm_type': 'ur10',
-        'pose': {
-            'xyz': [0.3, -0.92, 0.9],
-            'rpy': [0.0, 0.0, 0.0]
-        },
-        'default_initial_joint_states': {
-            'elbow_joint': 2.14,
-            'linear_arm_actuator_joint': 0,
-            'shoulder_lift_joint': -2.0,
-            'shoulder_pan_joint': 3.14,
-            'wrist_1_joint': 3.27,
-            'wrist_2_joint': -1.51,
-            'wrist_3_joint': 0,
-        }
-    },
+    # 'arm2': {
+    #     'arm_type': 'ur10',
+    #     'pose': {
+    #         'xyz': [0.3, -0.92, 0.9],
+    #         'rpy': [0.0, 0.0, 0.0]
+    #     },
+    #     'default_initial_joint_states': {
+    #         'elbow_joint': 2.14,
+    #         'linear_arm_actuator_joint': 0,
+    #         'shoulder_lift_joint': -2.0,
+    #         'shoulder_pan_joint': 3.14,
+    #         'wrist_1_joint': 3.27,
+    #         'wrist_2_joint': -1.51,
+    #         'wrist_3_joint': 0,
+    #     }
+    # },
 }
 possible_products = [
     'disk_part',
@@ -91,20 +91,20 @@ sensor_configs = {
     'quality_control': None,
 }
 default_sensors = {
-    'quality_control_sensor_1': {
-        'type': 'quality_control',
-        'pose': {
-            'xyz': [0.3, 3.5, 1.5],
-            'rpy': [0, 1.574, -1.574]
-        }
-    },
-    'quality_control_sensor_2': {
-        'type': 'quality_control',
-        'pose': {
-            'xyz': [0.3, -3.5, 1.5],
-            'rpy': [0, 1.574, 1.574]
-        }
-    },
+    # 'quality_control_sensor_1': {
+    #     'type': 'quality_control',
+    #     'pose': {
+    #         'xyz': [0.3, 3.5, 1.5],
+    #         'rpy': [0, 1.574, -1.574]
+    #     }
+    # },
+    # 'quality_control_sensor_2': {
+    #     'type': 'quality_control',
+    #     'pose': {
+    #         'xyz': [0.3, -3.5, 1.5],
+    #         'rpy': [0, 1.574, 1.574]
+    #     }
+    # },
 }
 default_belt_models = {
 }
@@ -530,7 +530,8 @@ def prepare_template_data(config_dict, args):
         'faulty_products': {},
         'drops': {},
         'orders': {},
-        'options': {'insert_agvs': True},
+        # 'options': {'insert_agvs': True},
+        'options': {'insert_agvs': False},
         'time_limit': default_time_limit,
         'bin_height': bin_height,
         'world_dir': world_dir,

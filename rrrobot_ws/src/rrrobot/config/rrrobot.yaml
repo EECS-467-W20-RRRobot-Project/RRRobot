@@ -79,32 +79,32 @@ random_seed: 1                       # Seed for the pseudo random number generat
 #   - piston_rod_part_57                # The piston rod part in the bins with randomized ID of 57
 #   - piston_rod_part_45
 
-# Models to be inserted in the bins
-models_over_bins:
-  bin1:                              # Name of the bin (bin1-bin6, as named in the environment simulation)
-    models:                          # List of models to insert
-      # gear_part:                     # Type of model to insert
-      #   xyz_start: [0.1, 0.1, 0]     # Origin of the first model to insert
-      #   xyz_end: [0.5, 0.5, 0]       # Origin of the last model to insert
-      #   rpy: [0, 0, 'pi/4']          # Orientation of all models to insert
-      #   num_models_x: 3              # How many models to insert along the x dimension
-      #   num_models_y: 5              # How many models to insert along the y dimension
-  # bin5:
-  #   models:
-  #     gasket_part:
-  #       xyz_start: [0.1, 0.1, 0.0]
-  #       xyz_end: [0.5, 0.5, 0.0]
-  #       rpy: [0, 0, 'pi/4']
-  #       num_models_x: 2
-  #       num_models_y: 3
-  # bin6:
-  #   models:
-  #     piston_rod_part:
-  #       xyz_start: [0.1, 0.1, 0.0]
-  #       xyz_end: [0.5, 0.5, 0.0]
-  #       rpy: [0, 0, 'pi/4']
-  #       num_models_x: 3
-  #       num_models_y: 3
+# # Models to be inserted in the bins
+# models_over_bins:
+#   bin1:                              # Name of the bin (bin1-bin6, as named in the environment simulation)
+#     models:                          # List of models to insert
+#       gear_part:                     # Type of model to insert
+#         xyz_start: [0.1, 0.1, 0]     # Origin of the first model to insert
+#         xyz_end: [0.5, 0.5, 0]       # Origin of the last model to insert
+#         rpy: [0, 0, 'pi/4']          # Orientation of all models to insert
+#         num_models_x: 3              # How many models to insert along the x dimension
+#         num_models_y: 5              # How many models to insert along the y dimension
+#   bin5:
+#     models:
+#       gasket_part:
+#         xyz_start: [0.1, 0.1, 0.0]
+#         xyz_end: [0.5, 0.5, 0.0]
+#         rpy: [0, 0, 'pi/4']
+#         num_models_x: 2
+#         num_models_y: 3
+#   bin6:
+#     models:
+#       piston_rod_part:
+#         xyz_start: [0.1, 0.1, 0.0]
+#         xyz_end: [0.5, 0.5, 0.0]
+#         rpy: [0, 0, 'pi/4']
+#         num_models_x: 3
+#         num_models_y: 3
 
 # # Models to be spawned in particular reference frames
 # models_to_spawn:
