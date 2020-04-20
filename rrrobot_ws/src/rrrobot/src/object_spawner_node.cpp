@@ -18,9 +18,8 @@ using std::endl;
 class ObjectSpawner
 {
 public:
-    ObjectSpawner(/*ros::NodeHandle *nh_, */ const std::string &model_file = "/app/rrrobot_ws/src/gazebo_models/model_mappings.txt")
-        : // nh(nh_),
-          DEFAULT_SPAWN_POINT(1.21825, 5.474367, 0.937978),
+    ObjectSpawner(const std::string &model_file = "/app/rrrobot_ws/src/gazebo_models/model_mappings.txt")
+        : DEFAULT_SPAWN_POINT(1.21825, 5.474367, 0.937978),
           CONVEYOR_WIDTH(0.391404)
     {
         // DEFAULT_SPAWN_POINT.x = 0.2516105;
@@ -90,120 +89,6 @@ private:
             // at roughly (0.2516105, 5.474367, 0.935669)
             // x range: 1.022548-1.413952
             // y range: anything (essentially)
-            // z
-            msg.pose.position.x = DEFAULT_SPAWN_POINT.x() /* + some random error */;
-            msg.pose.position.y = DEFAULT_SPAWN_POINT.y();
-            msg.pose.position.z = DEFAULT_SPAWN_POINT.z() + 1.0;
-
-            pub.publish(msg);
-            ros::spinOnce();
-        }
-    }
-};
-
-int main(int argc, char **argv)
-{
-    ros::init(argc, argv, "object_spawner");
-
-    ObjectSpawner spawner;
-
-    ros::spin();
-}           // y range: anything (essentially)
-            // z
-            msg.pose.position.x = DEFAULT_SPAWN_POINT.x() /* + some random error */;
-            msg.pose.position.y = DEFAULT_SPAWN_POINT.y();
-            msg.pose.position.z = DEFAULT_SPAWN_POINT.z() + 1.0;
-
-            pub.publish(msg);
-            ros::spinOnce();
-        }
-    }
-};
-
-int main(int argc, char **argv)
-{
-    ros::init(argc, argv, "object_spawner");
-
-    ObjectSpawner spawner;
-
-    ros::spin();
-}           // y range: anything (essentially)
-            // z
-            msg.pose.position.x = DEFAULT_SPAWN_POINT.x() /* + some random error */;
-            msg.pose.position.y = DEFAULT_SPAWN_POINT.y();
-            msg.pose.position.z = DEFAULT_SPAWN_POINT.z() + 1.0;
-
-            pub.publish(msg);
-            ros::spinOnce();
-        }
-    }
-};
-
-int main(int argc, char **argv)
-{
-    ros::init(argc, argv, "object_spawner");
-
-    ObjectSpawner spawner;
-
-    ros::spin();
-}           // y range: anything (essentially)
-            // z
-            msg.pose.position.x = DEFAULT_SPAWN_POINT.x() /* + some random error */;
-            msg.pose.position.y = DEFAULT_SPAWN_POINT.y();
-            msg.pose.position.z = DEFAULT_SPAWN_POINT.z() + 1.0;
-
-            pub.publish(msg);
-            ros::spinOnce();
-        }
-    }
-};
-
-int main(int argc, char **argv)
-{
-    ros::init(argc, argv, "object_spawner");
-
-    ObjectSpawner spawner;
-
-    ros::spin();
-}           // y range: anything (essentially)
-            // z
-            msg.pose.position.x = DEFAULT_SPAWN_POINT.x() /* + some random error */;
-            msg.pose.position.y = DEFAULT_SPAWN_POINT.y();
-            msg.pose.position.z = DEFAULT_SPAWN_POINT.z() + 1.0;
-
-            pub.publish(msg);
-            ros::spinOnce();
-        }
-    }
-};
-
-int main(int argc, char **argv)
-{
-    ros::init(argc, argv, "object_spawner");
-
-    ObjectSpawner spawner;
-
-    ros::spin();
-}           // y range: anything (essentially)
-            // z
-            msg.pose.position.x = DEFAULT_SPAWN_POINT.x() /* + some random error */;
-            msg.pose.position.y = DEFAULT_SPAWN_POINT.y();
-            msg.pose.position.z = DEFAULT_SPAWN_POINT.z() + 1.0;
-
-            pub.publish(msg);
-            ros::spinOnce();
-        }
-    }
-};
-
-int main(int argc, char **argv)
-{
-    ros::init(argc, argv, "object_spawner");
-
-    ObjectSpawner spawner;
-
-    ros::spin();
-}           // y range: anything (essentially)
             // z
             msg.pose.position.x = DEFAULT_SPAWN_POINT.x() /* + some random error */;
             msg.pose.position.y = DEFAULT_SPAWN_POINT.y();
