@@ -1,0 +1,4 @@
+[submodule "ariac_ws/src/universal_robot"]
+	path = ariac_ws/src/universal_robot
+	url = https://github.com/osrf/universal_robot
+	branch = ariac_2019_ur10_moveit_config
