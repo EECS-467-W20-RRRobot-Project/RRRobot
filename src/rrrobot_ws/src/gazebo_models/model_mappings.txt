@@ -1,3 +1,3 @@
-square_trash_can,unit_box/image.jpg,plastic
-unit_box,unit_box/image.jpg,plastic
-plastic_bottle,plastic_bottle/image.jpg,plastic
+square_trash_can,/app/rrrobot_ws/src/gazebo_models/unit_box/image.png,plastic
+unit_box,/app/rrrobot_ws/src/gazebo_models/unit_box/image.png,plastic
+plastic_bottle,/app/rrrobot_ws/src/gazebo_models/plastic_bottle/images/plastic-bottle-1.jpg,plastic
