@@ -8,6 +8,7 @@
 
 #include <osrf_gear/VacuumGripperState.h>
 #include <geometry_msgs/Point.h>
+#include <std_msgs/String.h>
 #include "rrrobot/model_insertion.h"
 #include <kdl/frames.hpp>
 
@@ -25,7 +26,8 @@ public:
         // DEFAULT_SPAWN_POINT.x = 0.2516105;
         // DEFAULT_SPAWN_POINT.y = 5.474367;
         // DEFAULT_SPAWN_POINT.z = 0.935669;
-        pub = nh.advertise<rrrobot::model_insertion>("/object_to_load", 1000);
+        model_pub = nh.advertise<rrrobot::model_insertion>("/object_to_load", 1000);
+        image_pub = nh.advertise<std_msgs::String>("/current_image", 1000);
         sub = nh.subscribe("/ariac/arm1/gripper/state", 1000, &ObjectSpawner::objectPlacedCallback, this);
         srand(time(NULL));
         read_in_items(model_file);
@@ -51,13 +53,21 @@ public:
     }
 
 private:
+    struct ObjectMapping
+    {
+        std::string model_name;
+        std::string image_file;
+        std::string correct_classification;
+    };
+
     const KDL::Vector DEFAULT_SPAWN_POINT;
     const float CONVEYOR_WIDTH;
     ros::NodeHandle nh;
-    ros::Publisher pub;
+    ros::Publisher model_pub;
+    ros::Publisher image_pub;
     ros::Subscriber sub;
-    std::vector<std::string> models; // TODO: just string? or do we need
-                                     //to store the correct classification too?
+    std::vector<ObjectMapping> models; // TODO: just string? or do we need
+                                       //to store the correct classification too?
 
     void read_in_items(const std::string &model_file)
     {
@@ -67,10 +77,13 @@ private:
         {
             // cout << "cur: " << cur << " cur.find(,): " << cur.find(",") << endl;
             // line format: model_name, image_file, model_classification
-            std::string model_name = cur.substr(0, cur.find(","));
-            // cur.erase(0, s.find(",") + 1);
-            // cur.erase(0, s.find(",") + 1);
-            models.push_back(model_name);
+            ObjectMapping cur_model;
+            cur_model.model_name = cur.substr(0, cur.find(","));
+            cur.erase(0, cur.find(",") + 1);
+            cur_model.image_file = cur.substr(0, cur.find(","));
+            cur.erase(0, cur.find(",") + 1);
+            cur_model.correct_classification = cur;
+            models.push_back(cur_model);
         }
     }
 
@@ -79,9 +92,11 @@ private:
         if (ros::ok())
         {
             rrrobot::model_insertion msg;
+            std_msgs::String image_file_msg;
 
             int rand_idx = rand() % models.size();
-            msg.model_name = models[rand_idx];
+            msg.model_name = models[rand_idx].model_name;
+            image_file_msg.data = models[rand_idx].image_file;
             cout << "Spawning " << msg.model_name << endl;
 
             // TODO: Determine position to spawn items
@@ -94,7 +109,8 @@ private:
             msg.pose.position.y = DEFAULT_SPAWN_POINT.y();
             msg.pose.position.z = DEFAULT_SPAWN_POINT.z() + 1.0;
 
-            pub.publish(msg);
+            model_pub.publish(msg);
+            image_pub.publish(image_file_msg);
             ros::spinOnce();
         }
     }

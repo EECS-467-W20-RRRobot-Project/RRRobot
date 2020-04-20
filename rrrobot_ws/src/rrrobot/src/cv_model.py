@@ -26,6 +26,7 @@ class Model_v1(nn.Module):
 
 def call_back(filename):
     # prepare input file
+    filename = filename.data
     input_image = Image.open(filename)
     input_image = input_image.resize((512, 384))
     # print(input_image.size)
@@ -49,24 +50,26 @@ def call_back(filename):
     print('type: ', type_dict[predicted_label])
 
     # publish a message, name of this node is 'cv_model'
-    ​pub = rospy.Publisher('cv_model', String, queue_size=10)
-​    ​rospy.init_node('talker', anonymous=True)
-​    ​rate = rospy.Rate(10) # 10hz
-    
-    ​garbage_type = type_dict[predicted_label]
-    ​rospy.loginfo(filename + ':' + garbage_type)
-    ​pub.publish(filename + ':' + garbage_type)
-    ​rate.sleep()
+    pub = rospy.Publisher('cv_model', String, queue_size=10)
+    # rospy.init_node('talker', anonymous=True)
+    rate = rospy.Rate(10) # 10hz
+
+    garbage_type = type_dict[predicted_label]
+    rospy.loginfo(filename + ':' + garbage_type)
+    pub.publish(filename + ':' + garbage_type)
+    rate.sleep()
 
 
 def listener():
-    rospy.init_node('listener', anonymous=True)
-    rospy.Subscriber('/ariac/logical_camera_1', String, callback)
+    # rospy.init_node('listener', anonymous=True)
+    rospy.Subscriber('/current_image', String, call_back)
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 
 
 if __name__ == '__main__':
+    rospy.init_node('cv_node')
+    
     # prepare pretrained model
     model = Model_v1()
     model.load_state_dict(torch.load('v1_0.001.pt', map_location='cpu'))

@@ -70,4 +70,7 @@ RUN sudo apt-get update && \
         ros-melodic-moveit-ros-visualization \
         ros-melodic-moveit-simple-controller-manager
 
+RUN pip3 install pyyaml
+RUN pip3 install rospkg
+
 CMD ["/bin/bash"]
