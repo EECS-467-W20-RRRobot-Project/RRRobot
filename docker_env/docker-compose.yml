@@ -60,7 +60,7 @@ services:
         # Mount gazebo folder on host to app folder in container
         volumes:
             #- .docker_env/gazebo/.gazebo:/root/.gazebo
-            - ../rrrobot_ws:/app/rrrobot_ws
+            - ../src/rrrobot_ws:/app/rrrobot_ws
         # Set DISPLAY variable and network mode for GUIs
         environment:
             - DISPLAY=${IP_ADDRESS}:0.0
@@ -77,12 +77,13 @@ services:
         build: ./gear
         # Mount gear folder on host to app folder in container
         volumes:
-            - ../rrrobot_ws:/app/rrrobot_ws
+            - ../src/rrrobot_ws:/app/rrrobot_ws
+            - ../src/ariac_ws:/app/ariac_ws
         # Set DISPLAY variable and network mode for GUIs
         environment:
             - DISPLAY=${IP_ADDRESS}:0.0
         # Set working directory in container to app folder
-        working_dir: /app/rrrobot_ws
+        working_dir: /app
         hostname: "rrrobot-env"
         networks:
             - ros
