@@ -1,9 +1,9 @@
 # Don't track the content of these folders #
 ############################################
-rrrobot_ws/lib/
-rrrobot_ws/build
-rrrobot_ws/devel
-rrrobot_ws/install
+src/rrrobot_ws/lib/
+src/rrrobot_ws/build
+src/rrrobot_ws/devel
+src/rrrobot_ws/install
 .*
 !.gitignore
 
