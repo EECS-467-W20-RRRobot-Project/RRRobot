@@ -25,6 +25,7 @@ find_package(gazebo REQUIRED)
 add_message_files(
   FILES
   model_insertion.msg
+  arm_command.msg
 )
 
 ## Generate added messages and services with any dependencies listed here
@@ -45,6 +46,7 @@ catkin_package(
 ## Build ##
 ###########
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
   ${roscpp_INCLUDE_DIRS}
   ${std_msgs_INCLUDE_DIRS}
@@ -60,7 +62,7 @@ add_dependencies(insert_model ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPOR
 
 ## Declare a C++ executable
 add_executable(rrrobot_node src/rrrobot_node.cpp)
-add_dependencies(rrrobot_node ${catkin_EXPORTED_TARGETS})
+add_dependencies(rrrobot_node ${catkin_EXPORTED_TARGETS} rrrobot_generate_messages_cpp)
 target_link_libraries(rrrobot_node ${catkin_LIBRARIES})
 
 add_executable(test_insert_object test/test_insert_object.cpp)
