@@ -26,6 +26,7 @@ find_package(gazebo REQUIRED)
 add_message_files(
   FILES
   model_insertion.msg
+  arm_command.msg
 )
 
 ## Generate added messages and services with any dependencies listed here
@@ -46,6 +47,7 @@ catkin_package(
 ## Build ##
 ###########
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
   ${roscpp_INCLUDE_DIRS}
   ${std_msgs_INCLUDE_DIRS}
@@ -60,9 +62,9 @@ add_dependencies(insert_model ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPOR
 
 
 ## Declare a C++ executable
-# add_executable(rrrobot_node src/rrrobot_node.cpp)
-# add_dependencies(rrrobot_node ${catkin_EXPORTED_TARGETS})
-# target_link_libraries(rrrobot_node ${catkin_LIBRARIES})
+add_executable(rrrobot_node src/rrrobot_node.cpp)
+add_dependencies(rrrobot_node ${catkin_EXPORTED_TARGETS} rrrobot_generate_messages_cpp)
+target_link_libraries(rrrobot_node ${catkin_LIBRARIES})
 
 add_executable(arm_controller_node src/arm_controller_node.cpp)
 add_dependencies(arm_controller_node ${catkin_EXPORTED_TARGETS})
@@ -101,11 +103,11 @@ target_link_libraries(insert_model
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS rrrobot_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS rrrobot_node
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 install(TARGETS arm_controller_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
