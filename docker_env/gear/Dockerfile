@@ -73,4 +73,6 @@ RUN sudo apt-get update && \
 RUN pip3 install pyyaml
 RUN pip3 install rospkg
 
+RUN sudo cp -r /usr/include/eigen3/Eigen /usr/include/Eigen
+
 CMD ["/bin/bash"]
