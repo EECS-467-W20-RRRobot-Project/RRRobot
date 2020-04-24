@@ -24,6 +24,8 @@
 #include <osrf_gear/LogicalCameraImage.h>
 #include <osrf_gear/Order.h>
 #include <osrf_gear/Proximity.h>
+#include <osrf_gear/VacuumGripperState.h>
+#include <osrf_gear/ConveyorBeltControl.h>
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/Range.h>
@@ -32,172 +34,175 @@
 #include <std_srvs/Trigger.h>
 #include <trajectory_msgs/JointTrajectory.h>
 
-/// Example class that can hold state and provide methods that handle incoming data.
-class MyCompetitionClass
+#include "topic_names.h"
+#include "rrrobot/arm_command.h"
+
+class Position
 {
 public:
-  explicit MyCompetitionClass(ros::NodeHandle & node)
-  : current_score_(0), arm_1_has_been_zeroed_(false), arm_2_has_been_zeroed_(false)
-  {
-    arm_1_joint_trajectory_publisher_ = node.advertise<trajectory_msgs::JointTrajectory>(
-      "/ariac/arm1/arm/command", 10);
-  }
+	float x, y, z;
 
-  /// Called when a new JointState message is received.
-  void arm_1_joint_state_callback(
-    const sensor_msgs::JointState::ConstPtr & joint_state_msg)
-  {
-    ROS_INFO_STREAM_THROTTLE(10,
-      "Joint States arm 1 (throttled to 0.1 Hz):\n" << *joint_state_msg);
-    // ROS_INFO_STREAM("Joint States:\n" << *joint_state_msg);
-    arm_1_current_joint_states_ = *joint_state_msg;
-    if (!arm_1_has_been_zeroed_) {
-      arm_1_has_been_zeroed_ = true;
-      ROS_INFO("Sending arm to zero joint positions...");
-      send_arm_to_zero_state(arm_1_joint_trajectory_publisher_);
-    }
-  }
-
-  /// Create a JointTrajectory with all positions set to zero, and command the arm.
-  void send_arm_to_zero_state(ros::Publisher & joint_trajectory_publisher) {
-    // Create a message to send.
-    trajectory_msgs::JointTrajectory msg;
-
-    // Fill the names of the joints to be controlled.
-    // Note that the vacuum_gripper_joint is not controllable.
-    msg.joint_names.clear();
-    msg.joint_names.push_back("shoulder_pan_joint");
-    msg.joint_names.push_back("shoulder_lift_joint");
-    msg.joint_names.push_back("elbow_joint");
-    msg.joint_names.push_back("wrist_1_joint");
-    msg.joint_names.push_back("wrist_2_joint");
-    msg.joint_names.push_back("wrist_3_joint");
-    msg.joint_names.push_back("linear_arm_actuator_joint");
-    // Create one point in the trajectory.
-    msg.points.resize(1);
-    // Resize the vector to the same length as the joint names.
-    // Values are initialized to 0.
-    msg.points[0].positions.resize(msg.joint_names.size(), 0.0);
-    // How long to take getting to the point (floating point seconds).
-    msg.points[0].time_from_start = ros::Duration(0.001);
-    ROS_INFO_STREAM("Sending command:\n" << msg);
-    joint_trajectory_publisher.publish(msg);
-  }
-
-private:
-  ros::Publisher arm_1_joint_trajectory_publisher_;
-  sensor_msgs::JointState arm_1_current_joint_states_;
-  bool arm_1_has_been_zeroed_;
+	Position(float x, float y, float z) : x(x), y(y), z(z){};
+	Position() : x(0), y(0), z(0) {}
 };
 
-class Position {
-  public:
-    float x, y, z;
+class RRRobot
+{
+public:
+	RRRobot()
+		: current_robot_state(RobotState::WAITING_FOR_CLASSIFICATION | RobotState::WAITING_FOR_GRAB_LOCATION),
+		  nh()
+	{
+		cv_classification_sub = nh.subscribe(CV_CLASSIFICATION_CHANNEL, 1000, &RRRobot::cv_classification_callback, this);
+		gripper_state_sub = nh.subscribe(GRIPPER_STATE_CHANNEL, 1000, &RRRobot::gripper_state_callback, this);
+		depth_camera_sub = nh.subscribe(DESIRED_GRASP_POSE_CHANNEL, 1000, &RRRobot::grasp_pose_callback, this);
 
-    Position(float x, float y, float z) : x(x), y(y), z(z) {};
-};
+		conveyor_pub = nh.serviceClient<osrf_gear::ConveyorBeltControl>(CONVEYOR_POWER_CHANNEL);
+		arm_destination_pub = nh.advertise<rrrobot::arm_command>(ARM_DESTINATION_CHANNEL, 1000);
 
-Position destination(String type) {
-	Position pos;
-	float z = 1;
-  
-	if (type == "cardboard") {
-    	pos = Position(-0.3, -1.916, z);
-  	}
-  	else if (type == "glass") {
-    	pos = Position(-0.3, -1.15, z);
-  	}
-  	else if (type == "metal") {
-    	pos = Position(-0.3, -0.383, z);
-  	}
-  	else if (type == "paper") {
-    	pos = Position(-0.3, 0.383, z);
-  	}
-  	else if (type == "plastic")
-  	{
-    	pos = Position(-0.3, 1.15, z);
-  	}
-  	else if (type == "trash")
-  	{
-    	pos = Position(-0.3, 1.916, z);
-  	}
-
-  	return pos;
-}
-
-void conveyor_controller(ros::NodeHandle node, int power) {
-	if (power != 0 && (power < 50 || power > 100)) {
-		return;
+		// start competition
+		ros::ServiceClient comp_start = nh.serviceClient<std_srvs::Trigger>(START_COMPETITON_CHANNEL);
+		std_srvs::Trigger trg;
+		comp_start.call(trg);
 	}
 
-	ros::ServiceClient client = node.serviceClient<osrf_gear::ConveyorBeltControl>("/ariac/conveyor/control");
-	osrf_gear::ConveyorBeltControl cmd;
-	cmd.power = power;
-	client.call(cmd);
+	void cv_classification_callback(const std_msgs::String &classification)
+	{
+		std::string type = classification.data.substr(classification.data.find(":") + 1);
 
-	return;
-}
+		Position drop_point = destination(type);
+		desired_drop_pose.position.x = drop_point.x;
+		desired_drop_pose.position.y = drop_point.y;
+		desired_drop_pose.position.z = drop_point.z;
+		// TODO: set the desired orientation of the end effector to point straight down
 
+		// update state
+		if (current_robot_state & RobotState::WAITING_FOR_GRAB_LOCATION)
+		{
+			current_robot_state &= ~RobotState::WAITING_FOR_CLASSIFICATION;
+		}
+		else
+		{
+			current_robot_state = RobotState::MOVING_ARM;
 
-// void spawn_items(ros::NodeHandle & node) {
-// 	ros::Publisher pub = node.advertise<rrrobot::model_insertion>("/object_to_load", 1000);
+			// tell the arm to move to grab the object
+			publish_arm_command();
+		}
+	}
 
-// 	if (ros::ok())
-// 	{
-// 		rrrobot::model_insertion msg;
-		
-// 		// TODO: Randomly select model to spawn
-// 		// msg.model_name = "SOMETHING";
+	void gripper_state_callback(const osrf_gear::VacuumGripperState &state)
+	{
+		if (state.attached)
+		{
+			current_robot_state = RobotState::MOVING_ARM;
 
-// 		// TODO: Determine position to spawn items
-// 		// can place objects on conveyor belt just upstream from the arms 
-// 		// at roughly (0.238416, 5.474367, 0.935669)
-// 		msg.pose.position.x = 0;
-// 		msg.pose.position.y = 0;
-// 		msg.pose.position.z = 0;
+			if (!gripper_state.attached)
+			{
+				// start the conveyor belt again
+				set_conveyor(100);
+			}
+		}
+		// just dropped the object
+		else if (gripper_state.attached /* && !state.attached */)
+		{
+			current_robot_state = RobotState::WAITING_FOR_CLASSIFICATION | RobotState::WAITING_FOR_GRAB_LOCATION;
+		}
 
-// 		pub.publish(msg);
-// 		ros::spinOnce();
-// 	}
-// }
+		// store current state
+		gripper_state = state;
+	}
 
+	void grasp_pose_callback(const geometry_msgs::Pose &grasp_pose)
+	{
+		// stop conveyor belt
+		set_conveyor(0);
 
-int main(int argc, char ** argv) {
-	// Last argument is the default name of the node.
-	ros::init(argc, argv, "rrrobot_node");
+		desired_grasp_pose = grasp_pose;
 
-	ros::NodeHandle node;
+		if (current_robot_state & RobotState::WAITING_FOR_CLASSIFICATION)
+		{
+			current_robot_state &= ~RobotState::WAITING_FOR_GRAB_LOCATION;
+		}
+		else
+		{
+			current_robot_state = RobotState::MOVING_ARM;
 
-	// Instance of custom class from above.
-	MyCompetitionClass comp_class(node);
+			publish_arm_command();
+		}
+	}
 
-	// Subscribe to the '/ariac/joint_states' topic.
-	ros::Subscriber arm_1_joint_state_subscriber = node.subscribe(
-		"/ariac/arm1/joint_states", 10,
-		&MyCompetitionClass::arm_1_joint_state_callback, &comp_class);
-	
-	// TODO: Spawn items (random order)
-	//    - Make a call to gazebo model insert script
-	spawn_items(node);
+private:
+	enum RobotState
+	{
+		WAITING_FOR_CLASSIFICATION = 0x1,
+		WAITING_FOR_GRAB_LOCATION = 0x1 << 1,
+		MOVING_ARM = 0x1 << 2
+	};
 
-	// TODO: Listen to cv_model topic for classification
-	// ros::Subscriber laser_profiler_subscriber = node.subscribe(
-	//   "/ariac/laser_profiler_1", 10, laser_profiler_callback);
+	int current_robot_state;
+	osrf_gear::VacuumGripperState gripper_state;
+	geometry_msgs::Pose desired_grasp_pose;
+	geometry_msgs::Pose desired_drop_pose;
 
-	// TODO: Listen to depth camera handler
-	//    - Pass store current object location
-	//    - Make call to arm controller (see below)
+	ros::NodeHandle nh;
 
-	// TODO: Start arm controller
-	//    - Stop conveyor belt
-	//    - Send destination and current location to arm controller
-	//    - Wait to receive successful drop-off signal
-	//    - Start conveyor belt
-	//    - Spawn new items
+	ros::Subscriber cv_classification_sub;
+	ros::Subscriber gripper_state_sub; // know when item has been grabbed, so conveyor can be started
+	ros::Subscriber depth_camera_sub;  // get desired grab location
 
-	ROS_INFO("Setup complete.");
-	start_competition(node);
-	ros::spin();  // This executes callbacks on new data until ctrl-c.
+	ros::ServiceClient conveyor_pub;
+	ros::Publisher arm_destination_pub;
+
+	Position destination(const std::string &type) const
+	{
+		Position pos;
+		float z = 1;
+
+		if (type == "cardboard")
+			pos = Position(-0.3, -1.916, z);
+		else if (type == "glass")
+			pos = Position(-0.3, -1.15, z);
+		else if (type == "metal")
+			pos = Position(-0.3, -0.383, z);
+		else if (type == "paper")
+			pos = Position(-0.3, 0.383, z);
+		else if (type == "plastic")
+			pos = Position(-0.3, 1.15, z);
+		else if (type == "trash")
+			pos = Position(-0.3, 1.916, z);
+
+		return pos;
+	}
+
+	void publish_arm_command()
+	{
+		rrrobot::arm_command cmd;
+		cmd.grab_location = desired_grasp_pose;
+		cmd.drop_location = desired_drop_pose;
+
+		arm_destination_pub.publish(cmd);
+		ros::spinOnce();
+	}
+
+	void set_conveyor(int power)
+	{
+		if (power != 0 && (power < 50 || power > 100))
+		{
+			return;
+		}
+
+		osrf_gear::ConveyorBeltControl cmd;
+		cmd.request.power = power;
+		conveyor_pub.call(cmd);
+	}
+};
+
+int main(int argc, char **argv)
+{
+	ros::init(argc, argv, "rrrobot");
+
+	RRRobot robot;
+	ros::spin(); // This executes callbacks on new data until ctrl-c.
 
 	return 0;
 }
