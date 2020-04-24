@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   gazebo_ros
   message_generation
+  moveit_ros_planning_interface
 )
 find_package(gazebo REQUIRED)
 
@@ -59,9 +60,13 @@ add_dependencies(insert_model ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPOR
 
 
 ## Declare a C++ executable
-add_executable(rrrobot_node src/rrrobot_node.cpp)
-add_dependencies(rrrobot_node ${catkin_EXPORTED_TARGETS})
-target_link_libraries(rrrobot_node ${catkin_LIBRARIES})
+# add_executable(rrrobot_node src/rrrobot_node.cpp)
+# add_dependencies(rrrobot_node ${catkin_EXPORTED_TARGETS})
+# target_link_libraries(rrrobot_node ${catkin_LIBRARIES})
+
+add_executable(arm_controller_node src/arm_controller_node.cpp)
+add_dependencies(arm_controller_node ${catkin_EXPORTED_TARGETS})
+target_link_libraries(arm_controller_node ${catkin_LIBRARIES})
 
 add_executable(test_insert_object test/test_insert_object.cpp)
 add_executable(object_spawner_node src/object_spawner_node.cpp)
@@ -96,7 +101,13 @@ target_link_libraries(insert_model
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS rrrobot_node
+# install(TARGETS rrrobot_node
+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
+
+install(TARGETS arm_controller_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

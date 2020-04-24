@@ -6,6 +6,7 @@ src/*/devel
 src/*/install
 .*
 !.gitignore
+src/*/core
 
 # Compiled source #
 ###################

@@ -19,12 +19,15 @@
 #include <moveit_msgs/AttachedCollisionObject.h>
 #include <moveit_msgs/CollisionObject.h>
 
-#include <moveit_visual_tools/moveit_visual_tools.h>
+// #include <moveit_visual_tools/moveit_visual_tools.h>
+
+using namespace std;
+// namespace rvt = rviz_visual_tools;
 
 
-Class ArmController {
+class ArmController {
 public:
-    ArmController(ros::NodeHandle & node) : arm_1_has_been_zeroed {
+    ArmController(ros::NodeHandle & node) : arm_1_has_been_zeroed_(false) {
         arm_1_joint_trajectory_publisher_ = node.advertise<trajectory_msgs::JointTrajectory>("/ariac/arm1/arm/command", 10);
     }
 
@@ -65,27 +68,52 @@ public:
         joint_trajectory_publisher.publish(msg);
     }
 
+    void target_callback(const geometry_msgs::Pose::ConstPtr & target_pose) {
+        // Setup
+        static const string PLANNING_GROUP = "manipulator";
+        moveit::planning_interface::MoveGroupInterface move_group(PLANNING_GROUP);
+        moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+        const robot_state::JointModelGroup* joint_model_group =
+            move_group.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
+        
+        // Getting Basic Information
+        ROS_INFO_NAMED("tutorial", "Planning frame: %s", move_group.getPlanningFrame().c_str());
+        ROS_INFO_NAMED("tutorial", "End effector link: %s", move_group.getEndEffectorLink().c_str());
+        ROS_INFO_NAMED("tutorial", "Available Planning Groups:");
+        std::copy(move_group.getJointModelGroupNames().begin(), move_group.getJointModelGroupNames().end(), std::ostream_iterator<std::string>(std::cout, ", "));
+        
+        // Planning to a Pose Goal
+        move_group.setPoseTarget(*target_pose);
+
+        moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+        bool success = (move_group.plan(my_plan) ==
+            moveit::planning_interface::MoveItErrorCode::SUCCESS);
+        ROS_INFO_NAMED("tutorial", "Visualizing plan 1 (pose goal) %s", success ? "" : "FAILED");
+
+        // Moving to a pose goal
+        move_group.move();
+    }
+
 private:
     ros::Publisher arm_1_joint_trajectory_publisher_;
     sensor_msgs::JointState arm_1_current_joint_states_;
     bool arm_1_has_been_zeroed_;
-}
-
-
-// TODO: Determine message type
-void location_callback(const sensor_msgs::/*MessageType*/::ConstPtr & msg) {
-    
-}
+};
 
 
 int main(int argc, char ** argv) {
+    cout << "Starting arm_controller_node" << endl;
+    
     // Last argument is the default name of the node.
     ros::init(argc, argv, "arm_controller_node");
 
     ros::NodeHandle node;
+
+    ArmController ac(node);
     
     // TODO: Subscribe to topic to receive current and destination locations
-    ros::Subscriber sub = node.subscribe(/*topic*/, 1, location_callback);
+    ros::Subscriber sub = node.subscribe("/target_pose", 1, &ArmController::target_callback, &ac);
+    ros::spin();
 
     // TODO: Move arm to pickup item from conveyor belt and turn on suction
 
