@@ -4,9 +4,18 @@ src/*/lib/
 src/*/build
 src/*/devel
 src/*/install
+
+# Don't track catkin build files #
+##################################
+core
+
+# vscode and other system specific files #
+##########################################
 .*
+
+# Include gitignore #
+#####################
 !.gitignore
-src/*/core
 
 # Compiled source #
 ###################

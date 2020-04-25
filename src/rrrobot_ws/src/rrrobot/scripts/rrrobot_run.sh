@@ -2,9 +2,9 @@
 
 cd /app/rrrobot_ws/
 
-catkin_make clean
+# catkin_make clean
 catkin_make
-catkin_make install
+# catkin_make install
 
 cd /app/rrrobot_ws/src/rrrobot/scripts
 

@@ -59,17 +59,6 @@ RUN pip3 install -U \
         torchvision \
         Pillow
 
-# MoveIt Dependencies
-RUN sudo apt-get update && \
-    sudo apt-get install -y \
-        ros-melodic-moveit-core \
-        ros-melodic-moveit-kinematics \
-        ros-melodic-moveit-ros-planning \
-        ros-melodic-moveit-ros-move-group \
-        ros-melodic-moveit-planners-ompl \
-        ros-melodic-moveit-ros-visualization \
-        ros-melodic-moveit-simple-controller-manager
-
 RUN pip3 install pyyaml
 RUN pip3 install rospkg
 
