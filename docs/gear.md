@@ -83,3 +83,21 @@ rostopic pub /ariac/arm1/arm/command trajectory_msgs/JointTrajectory    "{joint_
         positions: [0.0, 3.14,  -1.570,  2.14, 3.27, -1.51, 0.0]}, \
 ]}" -1
 ```
+
+## Running Full Simulation
+
+### ARIAC Environment
+
+- `cd /app/rrrobot_ws/src/rrrobot/scripts`
+- `./rrrobot_run.sh`
+
+### Build RRRobot Package
+
+- `cd /app/rrrobot_ws`
+- `catkin_make clean`
+- `catkin_make`
+- `source devel/setup.bash`
+
+### Arm Controller Node
+
+- `rosrun rrrobot arm_controller_node`

@@ -13,9 +13,14 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   gazebo_ros
   message_generation
-  moveit_ros_planning_interface
+  pcl_ros
+  pcl_conversions
 )
+
 find_package(gazebo REQUIRED)
+find_package(PCL 1.8 REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(orocos_kdl REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -53,6 +58,8 @@ include_directories(
   ${std_msgs_INCLUDE_DIRS}
   ${geometry_msgs_INCLUDE_DIRS}
   ${GAZEBO_INCLUDE_DIRS}
+  ${PCL_INCLUDE_DIRS}
+  ${Eigen3_INCLUDE_DIRS}
 )
 
 add_library(insert_model SHARED
@@ -68,7 +75,11 @@ target_link_libraries(rrrobot_node ${catkin_LIBRARIES})
 
 add_executable(arm_controller_node src/arm_controller_node.cpp)
 add_dependencies(arm_controller_node ${catkin_EXPORTED_TARGETS})
-target_link_libraries(arm_controller_node ${catkin_LIBRARIES})
+target_link_libraries(arm_controller_node ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
+
+add_executable(depth_camera_node src/depth_camera_node.cpp)
+add_dependencies(depth_camera_node ${catkin_EXPORTED_TARGETS})
+target_link_libraries(depth_camera_node ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
 add_executable(test_insert_object test/test_insert_object.cpp)
 add_executable(object_spawner_node src/object_spawner_node.cpp)
@@ -110,6 +121,12 @@ install(TARGETS rrrobot_node
 )
 
 install(TARGETS arm_controller_node
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(TARGETS depth_camera_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

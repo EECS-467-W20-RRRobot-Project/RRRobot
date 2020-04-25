@@ -265,7 +265,7 @@ int main(int argc, char ** argv) {
     
     ros::Subscriber sub = node.subscribe("/ariac/depth_camera_1", 1, depth_camera_callback);
 
-    pub = nh.advertise<geometry_msgs::Pose> ("output", 1);
+    pub = node.advertise<geometry_msgs::Pose> ("output", 1);
     
     // TODO: When item is in view, work with point cloud to get location (in world frame) for arm to reach to pickup item
     

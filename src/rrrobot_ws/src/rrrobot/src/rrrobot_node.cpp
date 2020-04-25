@@ -61,12 +61,12 @@ public:
 		arm_destination_pub = nh.advertise<rrrobot::arm_command>(ARM_DESTINATION_CHANNEL, 1000);
 
 		// start competition
-		ros::ServiceClient comp_start = nh.serviceClient<std_srvs::Trigger>(START_COMPETITON_CHANNEL);
+		ros::ServiceClient comp_start = nh.serviceClient<std_srvs::Trigger>(START_COMPETITION_CHANNEL);
 		std_srvs::Trigger trg;
 		comp_start.call(trg);
 	}
 
-	void cv_classification_callback(const std_msgs::String &classification)
+	void cv_classification_callback(const std_msgs::String & classification)
 	{
 		std::string type = classification.data.substr(classification.data.find(":") + 1);
 
