@@ -28,6 +28,7 @@ void depth_camera_callback(const sensor_msgs::PointCloud::ConstPtr & cloud_msg) 
 	float cam_x = 1.0;
 	float cam_y = 1.2;
 	float cam_z = 1.4;
+	// rpy = 0 1.21 0
 
   	// convert from PointCloud to PointCloud2
 	sensor_msgs::PointCloud2 cloud2;
