@@ -39,7 +39,7 @@ using std::string;
 class ArmRepresentation
 {
 public:
-    ArmRepresentation(const KDL::Frame &base_pose = KDL::Frame(KDL::Vector(0.3, 0.0, 0.9))); //KDL::Frame(KDL::Vector(0.3, 0.92, 1)));
+    ArmRepresentation(const KDL::Frame &base_pose = KDL::Frame(KDL::Rotation::Quaternion(0, 0, 0, 1), KDL::Vector(0.3, 0.92, 0.9))); //KDL::Frame(KDL::Vector(0.3, 0.92, 1)));
 
     int calculateForwardKinematics(const KDL::JntArray &joint_positions, KDL::Frame &end_effector_pose);
 
