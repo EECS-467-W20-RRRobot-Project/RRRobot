@@ -73,9 +73,13 @@ add_executable(rrrobot_node src/rrrobot_node.cpp)
 add_dependencies(rrrobot_node ${catkin_EXPORTED_TARGETS} rrrobot_generate_messages_cpp)
 target_link_libraries(rrrobot_node ${catkin_LIBRARIES})
 
-add_executable(arm_controller_node src/arm_controller_node.cpp)
+add_executable(arm_controller_node src/arm_controller_node.cpp  src/arm_representation.cpp)
 add_dependencies(arm_controller_node ${catkin_EXPORTED_TARGETS})
 target_link_libraries(arm_controller_node ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
+
+add_executable(test_arm test/test_arm.cpp src/arm_representation.cpp)
+add_dependencies(test_arm ${catkin_EXPORTED_TARGETS})
+target_link_libraries(test_arm ${catkin_LIBRARIES} ${orocos_kdl_LIBRARIES})
 
 add_executable(depth_camera_node src/depth_camera_node.cpp)
 add_dependencies(depth_camera_node ${catkin_EXPORTED_TARGETS})
