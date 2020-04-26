@@ -38,131 +38,6 @@
 
 using namespace std;
 
-// class ArmRepresentation
-// {
-// public:
-//     ArmRepresentation(const KDL::Frame &base_pose = KDL::Frame(KDL::Vector(0.3, 0.92, 1)))
-//     {
-//         const double base_len = 0.2;
-//         const double shoulder_height = 0.1273;
-//         const double upper_arm_length = 0.612;
-//         const double forearm_length = 0.5723;
-//         const double shoulder_offset = 0.220941;
-//         const double elbow_offset = -0.1719;
-//         const double wrist_1_length = 0.163941 - elbow_offset - shoulder_offset;
-//         const double wrist_2_length = 0.1157;
-//         const double wrist_3_length = 0.0922;
-
-//         // KDL::Vector pos; //(0, 0, base_len/2);
-//         // KDL::Rotation rot;
-
-//         // The joints might be off by one
-//         KDL::Segment linear_arm_actuator("linear_arm_actuator_joint",
-//                                          KDL::Joint(KDL::Joint::JointType::None), base_pose);
-//         arm.addSegment(linear_arm_actuator);
-
-//         const KDL::Vector pos_base(0, 0, base_len / 2);
-//         const KDL::Rotation rot_base(KDL::Rotation::RPY(0, 0, 0));
-//         KDL::Segment base_link("base_link", KDL::Joint("linear_arm_actuator_joint", KDL::Joint::JointType::TransY),
-//                                KDL::Frame(rot_base, pos_base));
-//         arm.addSegment(base_link);
-
-//         const KDL::Vector pos_shoulder(0, 0, shoulder_height);
-//         const KDL::Rotation rot_shoulder(KDL::Rotation::RPY(0, 0, 0));
-//         KDL::Segment shoulder_link("shoulder_link", KDL::Joint("shoulder_pan_joint", KDL::Joint::JointType::RotZ),
-//                                    KDL::Frame(rot_shoulder, pos_shoulder));
-//         arm.addSegment(shoulder_link);
-
-//         const KDL::Vector pos_upper_arm(0, shoulder_offset, 0);
-//         const KDL::Rotation rot_upper_arm(KDL::Rotation::RPY(0.0, M_PI / 2.0, 0.0));
-//         KDL::Segment upper_arm_link("upper_arm_link", KDL::Joint("shoulder_lift_joint", KDL::Joint::JointType::RotY),
-//                                     KDL::Frame(rot_upper_arm, pos_upper_arm));
-//         arm.addSegment(upper_arm_link);
-
-//         const KDL::Vector pos_forearm(0, elbow_offset, upper_arm_length);
-//         const KDL::Rotation rot_forearm(KDL::Rotation::RPY(0.0, 0.0, 0.0));
-//         KDL::Segment forearm_link("forearm_link", KDL::Joint("elbow_joint", KDL::Joint::JointType::RotY),
-//                                   KDL::Frame(rot_forearm, pos_forearm));
-//         arm.addSegment(forearm_link);
-
-//         const KDL::Vector pos_wrist_1(0, 0, forearm_length);
-//         const KDL::Rotation rot_wrist_1(KDL::Rotation::RPY(0.0, M_PI / 2.0, 0.0));
-//         KDL::Segment wrist_1_link("wrist_1_link", KDL::Joint("wrist_1_joint", KDL::Joint::JointType::RotY),
-//                                   KDL::Frame(rot_wrist_1, pos_wrist_1));
-//         arm.addSegment(wrist_1_link);
-
-//         const KDL::Vector pos_wrist_2(0, wrist_1_length, 0);
-//         const KDL::Rotation rot_wrist_2(KDL::Rotation::RPY(0.0, 0.0, 0.0));
-//         KDL::Segment wrist_2_link("wrist_2_link", KDL::Joint("wrist_2_joint", KDL::Joint::JointType::RotZ),
-//                                   KDL::Frame(rot_wrist_2, pos_wrist_2));
-//         arm.addSegment(wrist_2_link);
-
-//         const KDL::Vector pos_wrist_3(0, 0, wrist_2_length);
-//         const KDL::Rotation rot_wrist_3(KDL::Rotation::RPY(0.0, 0.0, 0.0));
-//         KDL::Segment wrist_3_link("wrist_3_link", KDL::Joint("wrist_3_joint", KDL::Joint::JointType::RotY),
-//                                   KDL::Frame(rot_wrist_3, pos_wrist_3));
-//         arm.addSegment(wrist_3_link);
-
-//         const KDL::Vector pos_ee(0, wrist_3_length, 0.0);
-//         const KDL::Rotation rot_ee(KDL::Rotation::RPY(0.0, 0.0, M_PI / 2.0));
-//         KDL::Segment ee_link("ee_link", KDL::Joint(KDL::Joint::JointType::None),
-//                              KDL::Frame(rot_ee, pos_ee));
-//         arm.addSegment(ee_link);
-
-//         // arm.addSegment(base_link);
-//         // arm.addSegment(shoulder_link);
-//         // arm.addSegment(upper_arm_link);
-//         // arm.addSegment(forearm_link);
-//         // arm.addSegment(wrist_1_link);
-//         // arm.addSegment(wrist_2_link);
-//         // arm.addSegment(wrist_3_link);
-//         // arm.addSegment(ee_link);
-
-//         ROS_INFO("Arm has %d joints", arm->getNrOfJoints());
-//         fk_solver.reset(new KDL::ChainFkSolverPos_recursive(arm));
-//         ik_solver.reset(new KDL::ChainIkSolverPos_LMA(arm));
-//     }
-
-//     int calculateForwardKinematics(const KDL::JntArray &joint_positions, KDL::Frame &end_effector_pose)
-//     {
-//         return fk_solver->JntToCart(joint_positions, end_effector_pose);
-//     }
-
-//     int calculateInverseKinematics(const KDL::JntArray &cur_configuration,
-//                                    const KDL::Frame &desired_end_effector_pose,
-//                                    KDL::JntArray &final_joint_configuration)
-//     {
-//         return ik_solver->CartToJnt(cur_configuration, desired_end_effector_pose, final_joint_configuration);
-//     }
-
-//     vector<string> get_joint_names()
-//     {
-//         vector<string> joints;
-
-//         for (int segment = 0; segment < arm->getNrOfSegments(); ++segment)
-//         {
-//             KDL::Joint cur = arm.getSegment(segment).getJoint();
-
-//             if (cur.getType() != KDL::Joint::JointType::None)
-//             {
-//                 joints.push_back(cur.getName());
-//             }
-//         }
-
-//         return joints;
-//     }
-
-//     const KDL::Chain &getChain() const
-//     {
-//         return arm;
-//     }
-
-// private:
-//     KDL::Chain arm;
-
-//     std::unique_ptr<KDL::ChainFkSolverPos_recursive> fk_solver;
-//     std::unique_ptr<KDL::ChainIkSolverPos_LMA> ik_solver;
-// };
 
 class ArmController
 {
@@ -174,7 +49,7 @@ public:
         gripper_ = node.serviceClient<osrf_gear::VacuumGripperControl>(GRIPPER_CONTROL_CHANNEL);
 
         // arm = std::move(arm_);
-        ROS_INFO("Arm size (in constructor): %d", arm->getChain()->getNrOfJoints());
+        // ROS_INFO("Arm size (in constructor): %d", arm->getChain()->getNrOfJoints());
         arm_current_joint_states_ = KDL::JntArray(arm->getChain()->getNrOfJoints());
         KDL::SetToZero(arm_current_joint_states_);
     }
@@ -232,6 +107,7 @@ public:
         int nbr_joints = arm->getChain()->getNrOfJoints();
         vector<double> positions;
         double time_from_start = 5; // Seconds
+        ros::Rate timeout(1.0/time_from_start);//
 
         // Move arm to pickup item from conveyor belt
         positions = calc_joint_positions(target_pose.grab_location);
@@ -241,6 +117,12 @@ public:
         while (!have_reached_target(frame_to_pose(calc_end_effector_pose()), target_pose.grab_location))
         {
             // TODO: Do something if not able to reach target
+            time_from_start += 5;
+            send_joint_trajectory(positions, time_from_start);
+            timeout.sleep();
+
+            // update sleep time_from_start
+            timeout = ros::Rate(1.0/time_from_start);
             continue;
         }
 
