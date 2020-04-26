@@ -40,7 +40,7 @@ ArmRepresentation::ArmRepresentation(const KDL::Frame &base_pose)
     chain.addSegment(shoulder_link);
 
     const KDL::Vector pos_upper_arm(0, shoulder_offset, 0);
-    const KDL::Rotation rot_upper_arm(KDL::Rotation::Quaternion(0, sqrt(2)/2, 0, sqrt(2)/2));
+    const KDL::Rotation rot_upper_arm(KDL::Rotation::Quaternion(0, sqrt(2) / 2, 0, sqrt(2) / 2));
     KDL::Segment upper_arm_link("upper_arm_link", KDL::Joint("shoulder_lift_joint", KDL::Joint::JointType::RotY),
                                 KDL::Frame(rot_upper_arm, pos_upper_arm));
     chain.addSegment(upper_arm_link);
@@ -52,7 +52,7 @@ ArmRepresentation::ArmRepresentation(const KDL::Frame &base_pose)
     chain.addSegment(forearm_link);
 
     const KDL::Vector pos_wrist_1(0, 0, forearm_length);
-    const KDL::Rotation rot_wrist_1(KDL::Rotation::Quaternion(0, sqrt(2)/2, 0, sqrt(2)/2));
+    const KDL::Rotation rot_wrist_1(KDL::Rotation::Quaternion(0, sqrt(2) / 2, 0, sqrt(2) / 2));
     KDL::Segment wrist_1_link("wrist_1_link", KDL::Joint("wrist_1_joint", KDL::Joint::JointType::RotY),
                               KDL::Frame(rot_wrist_1, pos_wrist_1));
     chain.addSegment(wrist_1_link);
@@ -70,7 +70,7 @@ ArmRepresentation::ArmRepresentation(const KDL::Frame &base_pose)
     chain.addSegment(wrist_3_link);
 
     const KDL::Vector pos_ee(0, wrist_3_length, 0.0);
-    const KDL::Rotation rot_ee(KDL::Rotation::Quaternion(0, 0, sqrt(2)/2, sqrt(2)/2));
+    const KDL::Rotation rot_ee(KDL::Rotation::Quaternion(0, 0, sqrt(2) / 2, sqrt(2) / 2));
     KDL::Segment ee_link("ee_link", KDL::Joint(KDL::Joint::JointType::None),
                          KDL::Frame(rot_ee, pos_ee));
     chain.addSegment(ee_link);
@@ -93,7 +93,7 @@ ArmRepresentation::ArmRepresentation(const KDL::Frame &base_pose)
 
 int ArmRepresentation::calculateForwardKinematics(const KDL::JntArray &joint_positions, KDL::Frame &end_effector_pose)
 {
-    KDL::ChainFkSolverPos_recursive fk_solver = KDL::ChainFkSolverPos_recursive(chain);
+    KDL::ChainFkSolverPos_recursive fk_solver(chain);
     int status = fk_solver.JntToCart(joint_positions, end_effector_pose);
 
     return status;
@@ -103,7 +103,7 @@ int ArmRepresentation::calculateInverseKinematics(const KDL::JntArray &cur_confi
                                                   const KDL::Frame &desired_end_effector_pose,
                                                   KDL::JntArray &final_joint_configuration)
 {
-    KDL::ChainIkSolverPos_LMA ik_solver = KDL::ChainIkSolverPos_LMA(chain);
+    KDL::ChainIkSolverPos_LMA ik_solver(chain, 1e-3, 2000, 1e-8);
     int status = ik_solver.CartToJnt(cur_configuration, desired_end_effector_pose, final_joint_configuration);
 
     return status;
