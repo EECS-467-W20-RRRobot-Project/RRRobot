@@ -86,18 +86,38 @@ rostopic pub /ariac/arm1/arm/command trajectory_msgs/JointTrajectory    "{joint_
 
 ## Running Full Simulation
 
-### ARIAC Environment
+### Terminal 1: ARIAC Environment
 
 - `cd /app/rrrobot_ws/src/rrrobot/scripts`
-- `./rrrobot_run.sh`
+- `./rrrobot_run_no_build.sh`
 
-### Build RRRobot Package
+### Terminal 2: Build RRRobot Package & Arm Controller Node
 
 - `cd /app/rrrobot_ws`
 - `catkin_make clean`
 - `catkin_make`
 - `source devel/setup.bash`
-
-### Arm Controller Node
-
 - `rosrun rrrobot arm_controller_node`
+
+### Terminal 3: CV Model
+
+- `cd /app/rrrobot_ws/src/rrrobot/src/`
+- `python3 cv_model.py`
+
+### Terminal 4: Depth Camera Node (for getting pick up location)
+
+- `cd /app/rrrobot_ws/`
+- `source devel/setup.bash`
+- `rosrun rrrobot depth_camera_node`
+
+### Terminal 5: Run the main rrrobot node
+
+- `cd /app/rrrobot_ws/`
+- `source devel/setup.bash`
+- `rosrun rrrobot rrrobot_node`
+
+### Terminal 6: Run the node to spawn random objects onto the conveyor belt
+
+- `cd /app/rrrobot_ws/`
+- `source devel/setup.bash`
+- `rosrun rrrobot object_spawner_node`

@@ -36,11 +36,7 @@
 
 #include "arm_representation.h"
 
-// using namespace std;
-using std::cin;
-using std::cout;
-using std::endl;
-using std::string;
+using namespace std;
 
 // class ArmRepresentation
 // {
@@ -190,7 +186,7 @@ int main(int argc, char **argv)
 
             f << end_effector_pose.p.x() << "," << end_effector_pose.p.y() << "," << end_effector_pose.p.z() << '\n';
 
-            error_code = arm.calculateInverseKinematics(pos, end_effector_pose, pos);
+            error_code = arm.calculateInverseKinematics(vector<double>(arm.getChain()->getNrOfJoints(), 0.0), end_effector_pose, pos);
 
             if (error_code != 0)
             {

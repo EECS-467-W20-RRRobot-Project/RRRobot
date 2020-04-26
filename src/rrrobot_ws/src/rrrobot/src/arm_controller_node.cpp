@@ -48,10 +48,12 @@ public:
 
         gripper_ = node.serviceClient<osrf_gear::VacuumGripperControl>(GRIPPER_CONTROL_CHANNEL);
 
+        arm_current_joint_states_.resize(arm->getChain()->getNrOfJoints(), 0.0);
+
         // arm = std::move(arm_);
         // ROS_INFO("Arm size (in constructor): %d", arm->getChain()->getNrOfJoints());
-        arm_current_joint_states_ = KDL::JntArray(arm->getChain()->getNrOfJoints());
-        KDL::SetToZero(arm_current_joint_states_);
+        // arm_current_joint_states_ = KDL::JntArray(arm->getChain()->getNrOfJoints());
+        // KDL::SetToZero(arm_current_joint_states_);
     }
 
     void joint_state_callback(const sensor_msgs::JointState &joint_state_msg)
@@ -64,22 +66,9 @@ public:
         vector<string> cur_joint_names = arm->get_joint_names();
         vector<double> position = joint_state_msg.position;
 
-        // Print joint name vectors for debugging
-        // ROS_INFO_STREAM("msg_joint_names: {");
-        // for (int i = 0; i < nbr_joints; ++i)
-        // {
-        //     ROS_INFO_STREAM(msg_joint_names[i] << ", ");
-        // }
-        // ROS_INFO_STREAM("}\ncur_joint_names: {");
-        // for (int j = 0; j < cur_joint_names.size(); ++j)
-        // {
-        //     ROS_INFO_STREAM(cur_joint_names[j] << ", ");
-        // }
-        // ROS_INFO_STREAM("}");
-
         for (int i = 0; i < nbr_joints; ++i)
         {
-            arm_current_joint_states_(i) = 0.0;
+            arm_current_joint_states_[i] = 0.0;
         }
 
         for (size_t i = 0; i < position.size(); ++i)
@@ -88,7 +77,7 @@ public:
             {
                 if (msg_joint_names[i].compare(cur_joint_names[j]) == 0)
                 {
-                    arm_current_joint_states_(j) = position[i];
+                    arm_current_joint_states_[j] = position[i];
                 }
             }
         }
@@ -122,7 +111,7 @@ public:
 
         // Move arm to pickup item from conveyor belt
         attempts = 1;
-        positions = calc_joint_positions(target_pose.grab_location);
+        positions = calc_joint_positions(target_pose.grab_location, above_conveyor);
         send_joint_trajectory(positions, arm_action_phase::bin_to_belt);
 
         // Check if target has been reached
@@ -151,7 +140,7 @@ public:
 
             // If item is not able to attach, adjust z and try again
             target_location.position.z -= item_attach_z_adjustment; // meters
-            positions = calc_joint_positions(target_location);
+            positions = calc_joint_positions(target_location, arm_current_joint_states_);
             send_joint_trajectory(positions, arm_action_phase::item_pickup_adjustment);
             attempts++;
         }
@@ -160,7 +149,7 @@ public:
 
         // Move item to desired position
         attempts = 1;
-        positions = calc_joint_positions(target_pose.drop_location);
+        positions = calc_joint_positions(target_pose.drop_location, above_bins);
         send_joint_trajectory(positions, arm_action_phase::belt_to_bin);
 
         // Check if target has been reached
@@ -198,7 +187,7 @@ public:
                 ROS_ERROR("STEP 6: Item not detaching.. ¯\\_(ツ)_/¯");
             }
             
-            ros::Duration(0.1).sleep();
+            ros::Duration(1).sleep();
             attempts++;
         }
 
@@ -206,11 +195,12 @@ public:
     }
 
 private:
+    // Private variables
     bool gripper_enabled_;
     bool item_attached_;
     ros::Publisher arm_joint_trajectory_publisher_;
     ros::ServiceClient gripper_;
-    KDL::JntArray arm_current_joint_states_;
+    vector<double> arm_current_joint_states_;
     ArmRepresentation *arm;
     enum arm_action_phase {
         belt_to_bin,
@@ -220,8 +210,11 @@ private:
     double time_per_step;
     int retry_attempts;
     double item_attach_z_adjustment;
+    // Define intermediate joint positions
+    const vector<double> above_conveyor = {0, 0, -M_PI/2, M_PI/2, -M_PI/2, -M_PI/2, 0};
+    const vector<double> above_bins = {0, M_PI, -M_PI/2, M_PI/2, -M_PI/2, -M_PI/2, 0};
 
-    vector<double> calc_joint_positions(const geometry_msgs::Pose &pose)
+    vector<double> calc_joint_positions(const geometry_msgs::Pose &pose, const vector<double> &start_state)
     {
         // KDL::JntArray cur_configuration(arm->getChain()->getNrOfJoints()); // = arm_current_joint_states_;
         // KDL::SetToZero(cur_configuration);
@@ -230,7 +223,7 @@ private:
 
         // ROS_INFO("cur_configuration (%i x %i)", cur_configuration.rows(), cur_configuration.columns());
 
-        int error_code = arm->calculateInverseKinematics(arm_current_joint_states_, desired_end_effector_pose, final_joint_configuration);
+        int error_code = arm->calculateInverseKinematics(start_state, desired_end_effector_pose, final_joint_configuration);
 
         // Check status of IK and print error message if there is a failure
         if (error_code != 0)
@@ -253,13 +246,16 @@ private:
 
     KDL::Frame calc_end_effector_pose()
     {
+        int num_joints = arm->getChain()->getNrOfJoints();
+        
         KDL::Frame end_effector_pose;
-        // KDL::JntArray joint_positions = arm_current_joint_states_;
-        KDL::JntArray joint_positions(arm->getChain()->getNrOfJoints());
-        KDL::SetToZero(joint_positions);
+        KDL::JntArray joint_positions(num_joints);
 
-        // ROS_INFO("joint_positions (%i x %i)", joint_positions.rows(), joint_positions.columns());
-        // ROS_INFO("arm chain # of joints: %d", arm->getChain()->getNrOfJoints());
+        // Copy current joint states values into JntArray
+        for (int i = 0; i < num_joints; ++i) {
+            joint_positions(i) = arm_current_joint_states_[i];
+        }
+
         int error_code = arm->calculateForwardKinematics(joint_positions, end_effector_pose);
 
         // Check status of FK and do something if there is a failure
@@ -315,10 +311,6 @@ private:
         // Declare JointTrajectory message
         trajectory_msgs::JointTrajectory msg;
 
-        // Define intermediate joint positions
-        const vector<double> above_conveyor = {0, 0, -M_PI/2, M_PI/2, -M_PI/2, -M_PI/2, 0};
-        const vector<double> above_bins = {0, M_PI, -M_PI/2, M_PI/2, -M_PI/2, -M_PI/2, 0};
-
         // Fill the names of the joints to be controlled
         msg.joint_names = arm->get_joint_names();
 
@@ -363,7 +355,7 @@ private:
 
         arm_joint_trajectory_publisher_.publish(msg);
 
-        // Wait to reach target
+        // TODO: Wait to reach target
         ros::Duration((num_points+1)*time_per_step).sleep();
     }
 
@@ -384,12 +376,14 @@ private:
     bool have_reached_target(geometry_msgs::Pose cur, geometry_msgs::Pose target)
     {
         // TODO: Tune threshold values
-        float pos_thresh = 0.1; // Meters
+        float pos_thresh = 0.15; // Meters
         float rot_thresh = 0.0875; // Radians
 
         float pos_err = fabs(cur.position.x - target.position.x) +
                         fabs(cur.position.y - target.position.y) +
                         fabs(cur.position.z - target.position.z);
+
+        ROS_INFO_STREAM("pos_err: " << pos_err << " (" << pos_thresh << ")");
 
         if (pos_err > pos_thresh)
         {
@@ -402,6 +396,15 @@ private:
         float rx_err = fabs(fmod(rpy1[0] - rpy2[0] + M_PI, M_PI));
         float ry_err = fabs(fmod(rpy1[1] - rpy2[1] + M_PI, M_PI));
         float rz_err = fabs(fmod(rpy1[2] - rpy2[2] + M_PI, M_PI));
+
+        // Errors now between 0 and pi
+        rx_err = min(rx_err, fabs(rx_err - (float) M_PI));
+        ry_err = min(ry_err, fabs(ry_err - (float) M_PI));
+        rz_err = min(rz_err, fabs(rz_err - (float) M_PI));
+
+        ROS_INFO_STREAM("rx_err: " << rx_err << " (" << rot_thresh << ")");
+        ROS_INFO_STREAM("ry_err: " << ry_err << " (" << rot_thresh << ")");
+        ROS_INFO_STREAM("rz_err: " << rz_err << " (" << rot_thresh << ")");
 
         if (rx_err > rot_thresh)
         {
@@ -449,9 +452,9 @@ int main(int argc, char **argv)
     // Subscribe to arm destination and joint states channels
     ros::Subscriber arm_destination_sub = node.subscribe(ARM_DESTINATION_CHANNEL, 1, &ArmController::arm_destination_callback, &ac);
 
-    ros::Subscriber gripper_state_sub = node.subscribe(GRIPPER_STATE_CHANNEL, 10, &ArmController::gripper_state_callback, &ac);
+    ros::Subscriber gripper_state_sub = node.subscribe(GRIPPER_STATE_CHANNEL, 1, &ArmController::gripper_state_callback, &ac);
 
-    ros::Subscriber joint_state_sub = node.subscribe(ARM_JOINT_STATES_CHANNEL, 10, &ArmController::joint_state_callback, &ac);
+    ros::Subscriber joint_state_sub = node.subscribe(ARM_JOINT_STATES_CHANNEL, 1, &ArmController::joint_state_callback, &ac);
 
     ROS_INFO("Setup complete");
 

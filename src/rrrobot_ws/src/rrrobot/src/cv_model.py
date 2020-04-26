@@ -38,7 +38,7 @@ def call_back(filename):
     # query model
     predicted_logits = model(input_tensor).squeeze()
     # print(predicted_logits.shape)
-    predicted_label = torch.argmax(predicted_logits).numpy().tolist()
+    predicted_label = torch.argmax(predicted_logits).detach().numpy().tolist()
 
     type_dict = {0: 'cardboard',
                  1: 'glass'    ,
