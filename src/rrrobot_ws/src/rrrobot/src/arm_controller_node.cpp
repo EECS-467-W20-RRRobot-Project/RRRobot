@@ -34,6 +34,7 @@
 #include <kdl/chainidsolver_recursive_newton_euler.hpp>
 
 #include <cstdlib>
+#include <math.h>
 
 using namespace std;
 
@@ -383,8 +384,8 @@ private:
     bool have_reached_target(geometry_msgs::Pose cur, geometry_msgs::Pose target)
     {
         // TODO: Tune threshold values
-        float pos_thresh = 0.01; // Meters
-        float rot_thresh = 0.02; // Radians
+        float pos_thresh = 0.1; // Meters
+        float rot_thresh = 0.0875; // Radians
 
         float pos_err = fabs(cur.position.x - target.position.x) +
                         fabs(cur.position.y - target.position.y) +
@@ -395,32 +396,37 @@ private:
             return false;
         }
 
-        float qx_err = fabs(cur.orientation.x - target.orientation.x);
-        float qy_err = fabs(cur.orientation.y - target.orientation.y);
-        float qz_err = fabs(cur.orientation.z - target.orientation.z);
-        float qw_err = fabs(cur.orientation.w - target.orientation.w);
+        vector<double> rpy1 = QuatToEuler(cur.orientation);
+        vector<double> rpy2 = QuatToEuler(target.orientation);
 
-        if (qx_err > rot_thresh)
+        float rx_err = fabs(fmod(rpy1[0] - rpy2[0], 2*M_PI));
+        float ry_err = fabs(fmod(rpy1[1] - rpy2[1], 2*M_PI));
+        float rz_err = fabs(fmod(rpy1[2] - rpy2[2], 2*M_PI));
+
+        if (rx_err > rot_thresh)
         {
             return false;
         }
 
-        if (qy_err > rot_thresh)
+        if (ry_err > rot_thresh)
         {
             return false;
         }
 
-        if (qz_err > rot_thresh)
-        {
-            return false;
-        }
-
-        if (qw_err > rot_thresh)
+        if (rz_err > rot_thresh)
         {
             return false;
         }
 
         return true;
+    }
+
+    vector<double> QuatToEuler(geometry_msgs::Quaternion q) {
+        KDL::Rotation r = KDL::Rotation::Quaternion(q.x, q.y, q.z, q.w);
+        vector<double> rpy = {0, 0, 0};
+        r.getRPY(rpy[0], rpy[1], rpy[2]);
+        
+        return rpy;
     }
 };
 
