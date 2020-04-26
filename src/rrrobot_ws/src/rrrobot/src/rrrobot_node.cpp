@@ -53,9 +53,9 @@ public:
 class RRRobot
 {
 public:
-	RRRobot()
+	RRRobot(ros::NodeHandle &node)
 		: current_robot_state(RobotState::WAITING_FOR_CLASSIFICATION | RobotState::WAITING_FOR_GRAB_LOCATION),
-		  nh()
+		  nh(node)
 	{
 		cv_classification_sub = nh.subscribe(CV_CLASSIFICATION_CHANNEL, 1000, &RRRobot::cv_classification_callback, this);
 		gripper_state_sub = nh.subscribe(GRIPPER_STATE_CHANNEL, 1000, &RRRobot::gripper_state_callback, this);
@@ -228,7 +228,9 @@ int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "rrrobot");
 
-	RRRobot robot;
+	ros::NodeHandle node;
+
+	RRRobot robot(node);
 	ros::spin(); // This executes callbacks on new data until ctrl-c.
 
 	return 0;
