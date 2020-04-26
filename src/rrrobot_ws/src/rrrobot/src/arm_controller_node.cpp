@@ -6,6 +6,7 @@
 #include <memory>
 
 #include <ros/ros.h>
+#include <ros/console.h>
 
 #include <std_msgs/Float32.h>
 #include <std_msgs/String.h>
@@ -32,8 +33,6 @@
 #include <kdl/chainfksolverpos_recursive.hpp>
 #include <kdl/chainidsolver_recursive_newton_euler.hpp>
 
-#include <ros/console.h>
-
 #include <cstdlib>
 
 using namespace std;
@@ -42,7 +41,7 @@ using namespace std;
 class ArmController
 {
 public:
-    ArmController(ros::NodeHandle &node, ArmRepresentation *arm_) : gripper_enabled_(false), item_attached_(false), arm(arm_)
+    ArmController(ros::NodeHandle &node, ArmRepresentation *arm_, double time_per_step, int retry_attempts, double item_attach_z_adjustment) : gripper_enabled_(false), item_attached_(false), arm(arm_), time_per_step(time_per_step), retry_attempts(retry_attempts), item_attach_z_adjustment(item_attach_z_adjustment)
     {
         arm_joint_trajectory_publisher_ = node.advertise<trajectory_msgs::JointTrajectory>(ARM_COMMAND_CHANNEL, 10);
 
@@ -103,65 +102,106 @@ public:
     void arm_destination_callback(const rrrobot::arm_command &target_pose)
     {
         ROS_INFO("Received target pose");
-
+        int attempts = 0;
         int nbr_joints = arm->getChain()->getNrOfJoints();
         vector<double> positions;
-        double time_from_start = 5; // Seconds
-        ros::Rate timeout(1.0/time_from_start);//
+        
+        // Turn on suction
+        while (!gripper_control(true)) {
+            if (attempts == retry_attempts) {
+                ROS_ERROR("STEP 1: Suction failed, not going to target");
+                return;
+            }
+            
+            ros::Duration(1).sleep();
+            attempts++;
+        }
+        
+        ROS_INFO("STEP 1: Suction turned on");
 
         // Move arm to pickup item from conveyor belt
+        attempts = 1;
         positions = calc_joint_positions(target_pose.grab_location);
-        send_joint_trajectory(positions, time_from_start);
+        send_joint_trajectory(positions, arm_action_phase::bin_to_belt);
 
-        // Wait until target position is reached
-        while (!have_reached_target(frame_to_pose(calc_end_effector_pose()), target_pose.grab_location))
-        {
-            // TODO: Do something if not able to reach target
-            time_from_start += 5;
-            send_joint_trajectory(positions, time_from_start);
-            timeout.sleep();
-
-            // update sleep time_from_start
-            timeout = ros::Rate(1.0/time_from_start);
-            continue;
+        // Check if target has been reached
+        while(!have_reached_target(frame_to_pose(calc_end_effector_pose()), target_pose.grab_location)) {
+            if (attempts == retry_attempts) {
+                ROS_ERROR("STEP 2: Did not reach target in allotted time");
+                return;
+            }
+            
+            send_joint_trajectory(positions, arm_action_phase::bin_to_belt);
+            attempts++;
         }
 
-        // Turn on suction
-        while (!gripper_enabled_)
-        {
-            gripper_control(true);
-        }
+        ROS_INFO("STEP 2: Reached target conveyor belt position");
+
+        attempts = 0;
+        geometry_msgs::Pose target_location = target_pose.grab_location;
 
         // Wait until object is attached
         while (!item_attached_)
         {
-            // TODO: Do something if item is not able to attach
-            continue;
+            if (attempts == retry_attempts) {
+                ROS_ERROR("STEP 3: Could not pick up item");
+                return;
+            }
+
+            // If item is not able to attach, adjust z and try again
+            target_location.position.z -= item_attach_z_adjustment; // meters
+            positions = calc_joint_positions(target_location);
+            send_joint_trajectory(positions, arm_action_phase::item_pickup_adjustment);
+            attempts++;
         }
+
+        ROS_INFO("STEP 3: Item picked up");
 
         // Move item to desired position
+        attempts = 1;
         positions = calc_joint_positions(target_pose.drop_location);
-        send_joint_trajectory(positions, time_from_start);
+        send_joint_trajectory(positions, arm_action_phase::belt_to_bin);
 
-        // Wait until target position is reached
-        while (!have_reached_target(frame_to_pose(calc_end_effector_pose()), target_pose.drop_location))
-        {
-            // TODO: Do something if not able to reach target
-            continue;
+        // Check if target has been reached
+        while(!have_reached_target(frame_to_pose(calc_end_effector_pose()), target_pose.grab_location)) {
+            if (attempts == retry_attempts) {
+                ROS_ERROR("STEP 4: Did not reach target in allotted time");
+                return;
+            }
+            
+            send_joint_trajectory(positions, arm_action_phase::belt_to_bin);
+            attempts++;
         }
+
+        ROS_INFO("STEP 4: Reached drop location");
 
         // Turn off suction
-        while (gripper_enabled_)
-        {
-            gripper_control(false);
+        attempts = 0;
+        while (!gripper_control(false)) {
+            if (attempts == retry_attempts) {
+                ROS_ERROR("STEP 5: Suction not turning off... ¯\\_(ツ)_/¯");
+                return;
+            }
+            
+            ros::Duration(1).sleep();
+            attempts++;
         }
 
+        ROS_INFO("STEP 5: Suction turned off");
+
         // Wait until object is detached
+        attempts = 0;
         while (item_attached_)
         {
-            // TODO: Do something if item doesn't detach
-            continue;
+            if (attempts == retry_attempts) {
+                ROS_ERROR("STEP 6: Item not detaching.. ¯\\_(ツ)_/¯");
+            }
+            
+            ros::Duration(0.1).sleep();
+            attempts++;
         }
+
+        ROS_INFO("STEP 6: Dropped item in bin");
     }
 
 private:
@@ -171,6 +211,14 @@ private:
     ros::ServiceClient gripper_;
     KDL::JntArray arm_current_joint_states_;
     ArmRepresentation *arm;
+    enum arm_action_phase {
+        belt_to_bin,
+        bin_to_belt,
+        item_pickup_adjustment
+    };
+    double time_per_step;
+    int retry_attempts;
+    double item_attach_z_adjustment;
 
     vector<double> calc_joint_positions(const geometry_msgs::Pose &pose)
     {
@@ -261,38 +309,75 @@ private:
         return pose;
     }
 
-    void send_joint_trajectory(const vector<double> &positions, double time_from_start)
+    void send_joint_trajectory(const vector<double> &target, arm_action_phase phase)
     {
         // Declare JointTrajectory message
         trajectory_msgs::JointTrajectory msg;
 
+        // Define intermediate joint positions
+        const vector<double> above_conveyor = {0, 0, -M_PI/2, M_PI/2, -M_PI/2, -M_PI/2, 0};
+        const vector<double> above_bins = {0, M_PI, -M_PI/2, M_PI/2, -M_PI/2, -M_PI/2, 0};
+
         // Fill the names of the joints to be controlled
         msg.joint_names = arm->get_joint_names();
 
-        // Create one point in the trajectory
-        msg.points.resize(1);
-        msg.points[0].positions.resize(msg.joint_names.size(), 0.0);
+        int num_points = 3;
 
-        // Set joint positions
-        for (size_t idx = 0; idx < positions.size(); ++idx)
-        {
-            msg.points[0].positions[idx] = positions[idx];
+        // Create points in the trajectory
+        msg.points.resize(num_points);
+
+        for (int i = 0; i < num_points; ++i) {
+            if (i == 0) {
+                if (phase == arm_action_phase::belt_to_bin) {
+                    msg.points[i].positions = above_conveyor;
+                }
+                else if (phase == arm_action_phase::bin_to_belt) {
+                    msg.points[i].positions = above_bins;
+                }
+                else if (phase == arm_action_phase::item_pickup_adjustment) {
+                    num_points = 1;
+                    msg.points.resize(num_points);
+                    msg.points[i].positions = target;
+                    msg.points[i].time_from_start = ros::Duration(time_per_step);
+                    break;
+                }
+
+                msg.points[i].time_from_start = ros::Duration((i+1)*time_per_step);
+            }
+            else if (i == 1) {
+                if (phase == arm_action_phase::belt_to_bin) {
+                    msg.points[i].positions = above_bins;
+                }
+                else if (phase == arm_action_phase::bin_to_belt) {
+                    msg.points[i].positions = above_conveyor;
+                }
+
+                msg.points[i].time_from_start = ros::Duration((i+1)*time_per_step);
+            }
+            else if (i == (num_points - 1)) {
+                msg.points[i].positions = target;
+                msg.points[i].time_from_start = ros::Duration((i+1)*time_per_step);
+            }
         }
 
-        // How long to take getting to the point (floating point seconds)
-        msg.points[0].time_from_start = ros::Duration(time_from_start);
-
-        //ROS_INFO("Sending command: \n%s", msg);
-
         arm_joint_trajectory_publisher_.publish(msg);
+
+        // Wait to reach target
+        ros::Duration((num_points+1)*time_per_step).sleep();
     }
 
-    void gripper_control(bool state)
+    bool gripper_control(bool state)
     {
         osrf_gear::VacuumGripperControl srv;
         srv.request.enable = state;
 
-        gripper_.call(srv);
+        bool success = gripper_.call(srv);
+
+        if(!success) {
+            ROS_ERROR("Could not enable gripper");
+        }
+
+        return success;
     }
 
     bool have_reached_target(geometry_msgs::Pose cur, geometry_msgs::Pose target)
@@ -350,7 +435,10 @@ int main(int argc, char **argv)
 
     ArmRepresentation arm;
 
-    ArmController ac(node, &arm);
+    double time_per_step = 3.0; // seconds
+    int retry_attempts = 3;
+    double item_attach_z_adjustment = 0.025; // meters
+    ArmController ac(node, &arm, time_per_step, retry_attempts, item_attach_z_adjustment);
 
     // Subscribe to arm destination and joint states channels
     ros::Subscriber arm_destination_sub = node.subscribe(ARM_DESTINATION_CHANNEL, 1, &ArmController::arm_destination_callback, &ac);
