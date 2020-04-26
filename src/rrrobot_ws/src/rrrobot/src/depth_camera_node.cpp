@@ -21,6 +21,8 @@
 #include <std_msgs/String.h>
 #include <std_srvs/Trigger.h>
 
+#include "topic_names.h"
+
 ros::Publisher pub;
 
 void depth_camera_callback(const sensor_msgs::PointCloud::ConstPtr &cloud_msg)
@@ -277,7 +279,7 @@ int main(int argc, char **argv)
 
 	ros::Subscriber sub = node.subscribe("/ariac/depth_camera_1", 1, depth_camera_callback);
 
-	pub = node.advertise<geometry_msgs::Pose>("output", 1);
+	pub = node.advertise<geometry_msgs::Pose>(DESIRED_GRASP_POSE_CHANNEL, 1);
 
 	ros::spin();
 	// TODO: When item is in view, work with point cloud to get location (in world frame) for arm to reach to pickup item
