@@ -399,9 +399,9 @@ private:
         vector<double> rpy1 = QuatToEuler(cur.orientation);
         vector<double> rpy2 = QuatToEuler(target.orientation);
 
-        float rx_err = fabs(fmod(rpy1[0] - rpy2[0], 2*M_PI));
-        float ry_err = fabs(fmod(rpy1[1] - rpy2[1], 2*M_PI));
-        float rz_err = fabs(fmod(rpy1[2] - rpy2[2], 2*M_PI));
+        float rx_err = fabs(fmod(rpy1[0] - rpy2[0] + M_PI, M_PI));
+        float ry_err = fabs(fmod(rpy1[1] - rpy2[1] + M_PI, M_PI));
+        float rz_err = fabs(fmod(rpy1[2] - rpy2[2] + M_PI, M_PI));
 
         if (rx_err > rot_thresh)
         {
@@ -424,7 +424,7 @@ private:
     vector<double> QuatToEuler(geometry_msgs::Quaternion q) {
         KDL::Rotation r = KDL::Rotation::Quaternion(q.x, q.y, q.z, q.w);
         vector<double> rpy = {0, 0, 0};
-        r.getRPY(rpy[0], rpy[1], rpy[2]);
+        r.GetRPY(rpy[0], rpy[1], rpy[2]);
         
         return rpy;
     }
