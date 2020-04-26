@@ -29,49 +29,49 @@ ArmRepresentation::ArmRepresentation(const KDL::Frame &base_pose)
 
     const KDL::Vector pos_base(0, 0, base_len / 2);
     const KDL::Rotation rot_base(KDL::Rotation::Quaternion(0, 0, 0, 1));
-    KDL::Segment base_link("base_link", KDL::Joint("linear_arm_actuator_joint", KDL::Joint::JointType::TransY),
+    KDL::Segment base_link("base_link", KDL::Joint(KDL::Joint::JointType::None), //KDL::Joint("linear_arm_actuator_joint", KDL::Joint::JointType::TransY),
                            KDL::Frame(rot_base, pos_base));
     chain.addSegment(base_link);
 
     const KDL::Vector pos_shoulder(0, 0, shoulder_height);
     const KDL::Rotation rot_shoulder(KDL::Rotation::Quaternion(0, 0, 0, 1));
-    KDL::Segment shoulder_link("shoulder_link", KDL::Joint("shoulder_pan_joint", KDL::Joint::JointType::RotZ),
+    KDL::Segment shoulder_link("shoulder_link", KDL::Joint("linear_arm_actuator_joint", KDL::Joint::JointType::TransY), //KDL::Joint("shoulder_pan_joint", KDL::Joint::JointType::RotZ),
                                KDL::Frame(rot_shoulder, pos_shoulder));
     chain.addSegment(shoulder_link);
 
     const KDL::Vector pos_upper_arm(0, shoulder_offset, 0);
     const KDL::Rotation rot_upper_arm(KDL::Rotation::Quaternion(0, sqrt(2) / 2, 0, sqrt(2) / 2));
-    KDL::Segment upper_arm_link("upper_arm_link", KDL::Joint("shoulder_lift_joint", KDL::Joint::JointType::RotY),
+    KDL::Segment upper_arm_link("upper_arm_link", KDL::Joint("shoulder_pan_joint", KDL::Joint::JointType::RotZ), //KDL::Joint("shoulder_lift_joint", KDL::Joint::JointType::RotY),
                                 KDL::Frame(rot_upper_arm, pos_upper_arm));
     chain.addSegment(upper_arm_link);
 
     const KDL::Vector pos_forearm(0, elbow_offset, upper_arm_length);
     const KDL::Rotation rot_forearm(KDL::Rotation::Quaternion(0, 0, 0, 1));
-    KDL::Segment forearm_link("forearm_link", KDL::Joint("elbow_joint", KDL::Joint::JointType::RotY),
+    KDL::Segment forearm_link("forearm_link", KDL::Joint("shoulder_lift_joint", KDL::Joint::JointType::RotY), //KDL::Joint("elbow_joint", KDL::Joint::JointType::RotY),
                               KDL::Frame(rot_forearm, pos_forearm));
     chain.addSegment(forearm_link);
 
     const KDL::Vector pos_wrist_1(0, 0, forearm_length);
     const KDL::Rotation rot_wrist_1(KDL::Rotation::Quaternion(0, sqrt(2) / 2, 0, sqrt(2) / 2));
-    KDL::Segment wrist_1_link("wrist_1_link", KDL::Joint("wrist_1_joint", KDL::Joint::JointType::RotY),
+    KDL::Segment wrist_1_link("wrist_1_link", KDL::Joint("elbow_joint", KDL::Joint::JointType::RotY), //KDL::Joint("wrist_1_joint", KDL::Joint::JointType::RotY),
                               KDL::Frame(rot_wrist_1, pos_wrist_1));
     chain.addSegment(wrist_1_link);
 
     const KDL::Vector pos_wrist_2(0, wrist_1_length, 0);
     const KDL::Rotation rot_wrist_2(KDL::Rotation::Quaternion(0, 0, 0, 1));
-    KDL::Segment wrist_2_link("wrist_2_link", KDL::Joint("wrist_2_joint", KDL::Joint::JointType::RotZ),
+    KDL::Segment wrist_2_link("wrist_2_link", KDL::Joint("wrist_1_joint", KDL::Joint::JointType::RotY), //KDL::Joint("wrist_2_joint", KDL::Joint::JointType::RotZ),
                               KDL::Frame(rot_wrist_2, pos_wrist_2));
     chain.addSegment(wrist_2_link);
 
     const KDL::Vector pos_wrist_3(0, 0, wrist_2_length);
     const KDL::Rotation rot_wrist_3(KDL::Rotation::Quaternion(0, 0, 0, 1));
-    KDL::Segment wrist_3_link("wrist_3_link", KDL::Joint("wrist_3_joint", KDL::Joint::JointType::RotY),
+    KDL::Segment wrist_3_link("wrist_3_link", KDL::Joint("wrist_2_joint", KDL::Joint::JointType::RotZ), //KDL::Joint("wrist_3_joint", KDL::Joint::JointType::RotY),
                               KDL::Frame(rot_wrist_3, pos_wrist_3));
     chain.addSegment(wrist_3_link);
 
     const KDL::Vector pos_ee(0, wrist_3_length, 0.0);
     const KDL::Rotation rot_ee(KDL::Rotation::Quaternion(0, 0, sqrt(2) / 2, sqrt(2) / 2));
-    KDL::Segment ee_link("ee_link", KDL::Joint(KDL::Joint::JointType::None),
+    KDL::Segment ee_link("ee_link", KDL::Joint("wrist_3_joint", KDL::Joint::JointType::RotY), //KDL::Joint(KDL::Joint::JointType::None),
                          KDL::Frame(rot_ee, pos_ee));
     chain.addSegment(ee_link);
 
@@ -91,10 +91,10 @@ ArmRepresentation::ArmRepresentation(const KDL::Frame &base_pose)
     // ik_solver.reset(new KDL::ChainIkSolverPos_LMA(arm));
 }
 
-int ArmRepresentation::calculateForwardKinematics(const KDL::JntArray &joint_positions, KDL::Frame &end_effector_pose)
+int ArmRepresentation::calculateForwardKinematics(const KDL::JntArray &joint_positions, KDL::Frame &end_effector_pose, int joint_nbr)
 {
     KDL::ChainFkSolverPos_recursive fk_solver(chain);
-    int status = fk_solver.JntToCart(joint_positions, end_effector_pose);
+    int status = fk_solver.JntToCart(joint_positions, end_effector_pose, joint_nbr);
 
     return status;
 }
