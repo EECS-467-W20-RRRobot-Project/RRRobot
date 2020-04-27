@@ -159,13 +159,13 @@ void depth_camera_callback(const sensor_msgs::PointCloud::ConstPtr &cloud_msg)
 		z /= s;
 
 		// print cluster center
-		std::cout << "cluster at: " << x << ", " << y << ", " << z << std::endl;
+		// std::cout << "cluster at: " << x << ", " << y << ", " << z << std::endl;
 
 		// check if center is within box
 		if (x < 1.25 && x > 1.15 && y < cam_y + .05 && y > cam_y - .05)
 		{
 			// object detected
-			std::cout << "object in position" << std::endl;
+			// std::cout << "object in position" << std::endl;
 			obj_idx = j;
 		}
 
@@ -187,7 +187,7 @@ void depth_camera_callback(const sensor_msgs::PointCloud::ConstPtr &cloud_msg)
 			obj_cloud.push_back(point);
 		}
 
-		std::cout << "object cluster size: " << obj_cloud.points.size() << std::endl;
+		// std::cout << "object cluster size: " << obj_cloud.points.size() << std::endl;
 
 		// create 3D bounding box.
 		float xmin = 10.0;
@@ -211,8 +211,8 @@ void depth_camera_callback(const sensor_msgs::PointCloud::ConstPtr &cloud_msg)
 		float area_top = (ymax - ymin) * (xmax - xmin);
 		float area_side = (zmax - zmin) * (ymax - ymin);
 
-		std::cout << "object top area: " << area_top << std::endl;
-		std::cout << "object side area: " << area_side << std::endl;
+		// std::cout << "object top area: " << area_top << std::endl;
+		// std::cout << "object side area: " << area_side << std::endl;
 
 		geometry_msgs::Pose pose;
 		geometry_msgs::Point p;
@@ -221,7 +221,7 @@ void depth_camera_callback(const sensor_msgs::PointCloud::ConstPtr &cloud_msg)
 		// pick up from top (-z direction)
 		if (area_top > .002)
 		{
-			std::cout << "picking up object from top" << std::endl;
+			// std::cout << "picking up object from top" << std::endl;
 			p.x = (xmin + xmax) / 2;
 			p.y = (ymin + ymax) / 2;
 			p.z = zmax;
@@ -235,7 +235,7 @@ void depth_camera_callback(const sensor_msgs::PointCloud::ConstPtr &cloud_msg)
 		else
 		{
 			// pick up from front (+x direction)
-			std::cout << "picking up object from front" << std::endl;
+			// std::cout << "picking up object from front" << std::endl;
 			p.x = xmin;
 			p.y = (ymin + ymax) / 2;
 			p.z = (zmax + zmin) / 2;
