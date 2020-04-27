@@ -43,7 +43,7 @@ public:
 
     int calculateForwardKinematics(const KDL::JntArray &joint_positions, KDL::Frame &end_effector_pose, int joint_nbr = -1);
 
-    int calculateInverseKinematics(const KDL::JntArray &cur_configuration,
+    int calculateInverseKinematics(const std::vector<double> &cur_configuration,
                                    const KDL::Frame &desired_end_effector_pose,
                                    KDL::JntArray &final_joint_configuration);
 

@@ -99,12 +99,22 @@ int ArmRepresentation::calculateForwardKinematics(const KDL::JntArray &joint_pos
     return status;
 }
 
-int ArmRepresentation::calculateInverseKinematics(const KDL::JntArray &cur_configuration,
+int ArmRepresentation::calculateInverseKinematics(const vector<double> &cur_configuration,
                                                   const KDL::Frame &desired_end_effector_pose,
                                                   KDL::JntArray &final_joint_configuration)
 {
     KDL::ChainIkSolverPos_LMA ik_solver(chain, 1e-3, 2000, 1e-8);
-    int status = ik_solver.CartToJnt(cur_configuration, desired_end_effector_pose, final_joint_configuration);
+    
+    // Convert cur_configuration vector to JntArray
+    int num_joints = chain.getNrOfJoints();
+    KDL::JntArray pos(num_joints);
+    KDL::SetToZero(pos);
+
+    for (int i = 0; i < num_joints; ++i) {
+        pos(i) = cur_configuration[i];
+    }
+
+    int status = ik_solver.CartToJnt(pos, desired_end_effector_pose, final_joint_configuration);
 
     return status;
 }

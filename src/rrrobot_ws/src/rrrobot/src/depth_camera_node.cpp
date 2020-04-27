@@ -218,7 +218,7 @@ void depth_camera_callback(const sensor_msgs::PointCloud::ConstPtr &cloud_msg)
 		geometry_msgs::Point p;
 		geometry_msgs::Quaternion q;
 
-		// pick up from top
+		// pick up from top (-z direction)
 		if (area_top > .002)
 		{
 			std::cout << "picking up object from top" << std::endl;
@@ -228,23 +228,23 @@ void depth_camera_callback(const sensor_msgs::PointCloud::ConstPtr &cloud_msg)
 
 			// rpy = 0 0 0
 			q.x = 0;
-			q.y = 0;
+			q.y = 0.707;
 			q.z = 0;
-			q.w = 1;
+			q.w = 0.707;
 		}
 		else
 		{
-			// pick up from front
+			// pick up from front (+x direction)
 			std::cout << "picking up object from front" << std::endl;
 			p.x = xmin;
 			p.y = (ymin + ymax) / 2;
 			p.z = (zmax + zmin) / 2;
 
 			// rpy = -pi/2 0 pi/2
-			q.x = -0.63;
-			q.y = 0;
-			q.z = 0.63;
-			q.w = 0.44;
+			q.x = 0.707;
+			q.y = 0.0;
+			q.z = 0.0;
+			q.w = 0.707;
 		}
 
 		pose.position = p;
@@ -271,18 +271,16 @@ void depth_camera_callback(const sensor_msgs::PointCloud::ConstPtr &cloud_msg)
 
 int main(int argc, char **argv)
 {
-	// TODO: Subscribe to depth camera topic
 	// Last argument is the default name of the node.
 	ros::init(argc, argv, "depth_camera_node");
 
 	ros::NodeHandle node;
 
+	// Subscribe to depth camera topic
 	ros::Subscriber sub = node.subscribe("/ariac/depth_camera_1", 1, depth_camera_callback);
 
+	// Publish object's current location to topic for RRRobot node to listen to
 	pub = node.advertise<geometry_msgs::Pose>(DESIRED_GRASP_POSE_CHANNEL, 1);
 
 	ros::spin();
-	// TODO: When item is in view, work with point cloud to get location (in world frame) for arm to reach to pickup item
-
-	// TODO: Publish object's current location to topic for RRRobot node to listen to
 }
