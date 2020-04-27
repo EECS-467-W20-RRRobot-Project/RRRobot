@@ -61,5 +61,7 @@ RUN pip3 install -U \
 
 RUN pip3 install pyyaml
 RUN pip3 install rospkg
+RUN pip3 install matplotlib
+RUN sudo apt-get install python3-tk
 
 CMD ["/bin/bash"]
