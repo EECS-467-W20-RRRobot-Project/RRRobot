@@ -85,7 +85,7 @@ public:
 		{
 			current_robot_state &= ~RobotState::WAITING_FOR_CLASSIFICATION;
 		}
-		else
+		else if ((current_robot_state & RobotState::MOVING_ARM) == 0x0)
 		{
 			current_robot_state = RobotState::MOVING_ARM;
 
@@ -133,7 +133,7 @@ public:
 		{
 			current_robot_state &= ~RobotState::WAITING_FOR_GRAB_LOCATION;
 		}
-		else
+		else if ((current_robot_state & RobotState::MOVING_ARM) == 0x0)
 		{
 			current_robot_state = RobotState::MOVING_ARM;
 
@@ -171,11 +171,13 @@ private:
 	Position destination(const std::string &type) const
 	{
 		Position pos;
-		
-		if(type == "trash") {
+
+		if (type == "trash")
+		{
 			pos = trash_bin;
 		}
-		else {
+		else
+		{
 			pos = recycle_bin;
 		}
 
