@@ -34,3 +34,4 @@ core
 *.old
 *.custom
 *.run
+*.debug

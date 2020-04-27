@@ -153,7 +153,7 @@ public:
         send_joint_trajectory(positions, arm_action_phase::belt_to_bin);
 
         // Check if target has been reached
-        while(!have_reached_target(frame_to_pose(calc_end_effector_pose()), target_pose.grab_location)) {
+        while(!have_reached_target(frame_to_pose(calc_end_effector_pose()), target_pose.drop_location)) {
             if (attempts == retry_attempts) {
                 ROS_ERROR("STEP 4: Did not reach target in allotted time");
                 return;
@@ -377,59 +377,49 @@ private:
     {
         // TODO: Tune threshold values
         float pos_thresh = 0.15; // Meters
-        float rot_thresh = 0.0875; // Radians
+        float rot_thresh = 0.025;
 
         float pos_err = fabs(cur.position.x - target.position.x) +
                         fabs(cur.position.y - target.position.y) +
                         fabs(cur.position.z - target.position.z);
 
-        ROS_INFO_STREAM("pos_err: " << pos_err << " (" << pos_thresh << ")");
+        // ROS_INFO_STREAM("pos_err: " << pos_err << " (" << pos_thresh << ")");
 
         if (pos_err > pos_thresh)
         {
             return false;
         }
 
-        vector<double> rpy1 = QuatToEuler(cur.orientation);
-        vector<double> rpy2 = QuatToEuler(target.orientation);
+        float qx_err = fabs(fabs(cur.orientation.x) - fabs(target.orientation.x));
+        float qy_err = fabs(fabs(cur.orientation.y) - fabs(target.orientation.y));
+        float qz_err = fabs(fabs(cur.orientation.z) - fabs(target.orientation.z));
+        float qw_err = fabs(fabs(cur.orientation.w) - fabs(target.orientation.w));
 
-        float rx_err = fabs(fmod(rpy1[0] - rpy2[0] + M_PI, M_PI));
-        float ry_err = fabs(fmod(rpy1[1] - rpy2[1] + M_PI, M_PI));
-        float rz_err = fabs(fmod(rpy1[2] - rpy2[2] + M_PI, M_PI));
+        ROS_INFO_STREAM("qx_err: " << qx_err << " (" << rot_thresh << ")");
+        ROS_INFO_STREAM("qy_err: " << qy_err << " (" << rot_thresh << ")");
+        ROS_INFO_STREAM("qz_err: " << qz_err << " (" << rot_thresh << ")");
+        ROS_INFO_STREAM("qw_err: " << qw_err << " (" << rot_thresh << ")");
 
-        // Errors now between 0 and pi
-        rx_err = min(rx_err, fabs(rx_err - (float) M_PI));
-        ry_err = min(ry_err, fabs(ry_err - (float) M_PI));
-        rz_err = min(rz_err, fabs(rz_err - (float) M_PI));
-
-        ROS_INFO_STREAM("rx_err: " << rx_err << " (" << rot_thresh << ")");
-        ROS_INFO_STREAM("ry_err: " << ry_err << " (" << rot_thresh << ")");
-        ROS_INFO_STREAM("rz_err: " << rz_err << " (" << rot_thresh << ")");
-
-        if (rx_err > rot_thresh)
+        if (qx_err > rot_thresh)
         {
             return false;
         }
 
-        if (ry_err > rot_thresh)
+        if (qy_err > rot_thresh)
         {
             return false;
         }
 
-        if (rz_err > rot_thresh)
+        if (qz_err > rot_thresh)
         {
+            return false;
+        }
+
+        if (qw_err > rot_thresh) {
             return false;
         }
 
         return true;
-    }
-
-    vector<double> QuatToEuler(geometry_msgs::Quaternion q) {
-        KDL::Rotation r = KDL::Rotation::Quaternion(q.x, q.y, q.z, q.w);
-        vector<double> rpy = {0, 0, 0};
-        r.GetRPY(rpy[0], rpy[1], rpy[2]);
-        
-        return rpy;
     }
 };
 
@@ -449,6 +439,9 @@ int main(int argc, char **argv)
     double item_attach_z_adjustment = 0.025; // meters
     ArmController ac(node, &arm, time_per_step, retry_attempts, item_attach_z_adjustment);
 
+    ros::AsyncSpinner spinner(0);
+    spinner.start();
+
     // Subscribe to arm destination and joint states channels
     ros::Subscriber arm_destination_sub = node.subscribe(ARM_DESTINATION_CHANNEL, 1, &ArmController::arm_destination_callback, &ac);
 
@@ -459,7 +452,7 @@ int main(int argc, char **argv)
     ROS_INFO("Setup complete");
 
     // Execute callbacks on new data until ctrl-c
-    ros::spin();
+    ros::waitForShutdown();
 
     return 0;
 }

@@ -170,7 +170,7 @@ int main(int argc, char **argv)
     // std::cin >> joint;
 
     KDL::Frame end_effector_pose;
-    std::ofstream f("data.txt");
+    std::ofstream f("arm_test.debug");
     int error_code;
     for (joint = 0; joint < arm.getChain()->getNrOfJoints(); ++joint)
     {
