@@ -1,6 +1,6 @@
-plastic_bottle,/app/rrrobot_ws/src/gazebo_models/plastic_bottle/images/plastic-bottle-1.jpg,plastic
-paper_bag,/app/rrrobot_ws/src/gazebo_models/paper_bag/images/paper-bag-1.jpg,paper
-pop_can,/app/rrrobot_ws/src/gazebo_models/pop_can/images/pop-can-1.jpg,metal
-unit_box,/app/rrrobot_ws/src/gazebo_models/trash_images/chips-1.jpg,trash
-unit_box,/app/rrrobot_ws/src/gazebo_models/trash_images/chips-2.jpeg,trash
-pringles,/app/rrrobot_ws/src/gazebo_models/trash_images/chips-3.jpg,trash
+generic_recyclable,/app/rrrobot_ws/src/gazebo_models/plastic_bottle/images/plastic-bottle-1.jpg,plastic
+generic_recyclable,/app/rrrobot_ws/src/gazebo_models/paper_bag/images/paper-bag-1.jpg,paper
+generic_recyclable,/app/rrrobot_ws/src/gazebo_models/pop_can/images/pop-can-1.jpg,metal
+generic_trash,/app/rrrobot_ws/src/gazebo_models/trash_images/chips-1.jpg,trash
+generic_trash,/app/rrrobot_ws/src/gazebo_models/trash_images/chips-2.jpeg,trash
+generic_trash,/app/rrrobot_ws/src/gazebo_models/trash_images/chips-3.jpg,trash
