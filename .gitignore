@@ -1,0 +1,37 @@
+# Don't track the content of these folders #
+############################################
+src/*/lib/
+src/*/build
+src/*/devel
+src/*/install
+
+# Don't track catkin build files #
+##################################
+core
+
+# vscode and other system specific files #
+##########################################
+.*
+
+# Include gitignore #
+#####################
+!.gitignore
+
+# Compiled source #
+###################
+*.o
+*.so
+
+# Packages #
+############
+*.tar
+*.gz
+*.zip
+
+# Other #
+#########
+*.backup
+*.old
+*.custom
+*.run
+*.debug

@@ -1,0 +1,2 @@
+geometry_msgs/Pose grab_location
+geometry_msgs/Pose drop_location

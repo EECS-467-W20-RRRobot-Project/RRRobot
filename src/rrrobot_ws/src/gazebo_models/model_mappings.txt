@@ -1,0 +1,10 @@
+generic_recyclable,/app/rrrobot_ws/src/gazebo_models/recycling_images/plastic.jpg,plastic
+generic_recyclable,/app/rrrobot_ws/src/gazebo_models/recycling_images/paper.jpg,paper
+generic_recyclable,/app/rrrobot_ws/src/gazebo_models/recycling_images/metal.jpg,metal
+generic_recyclable,/app/rrrobot_ws/src/gazebo_models/recycling_images/glass.jpg,glass
+generic_recyclable,/app/rrrobot_ws/src/gazebo_models/recycling_images/cardboard.jpg,cardboard
+generic_trash,/app/rrrobot_ws/src/gazebo_models/trash_images/trash_1.jpg,trash
+generic_trash,/app/rrrobot_ws/src/gazebo_models/trash_images/trash_2.jpg,trash
+generic_trash,/app/rrrobot_ws/src/gazebo_models/trash_images/trash_3.jpg,trash
+generic_trash,/app/rrrobot_ws/src/gazebo_models/trash_images/trash_4.jpg,trash
+generic_trash,/app/rrrobot_ws/src/gazebo_models/trash_images/trash_5.jpg,trash

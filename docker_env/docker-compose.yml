@@ -1,0 +1,88 @@
+# Docker Compose
+
+# docker-compose.yml format version
+version: '3'
+
+networks:
+    ros:
+        driver: bridge
+
+# Define services
+services:
+    # ROS Development Service
+    ros-dev:
+        # Use Dockerfile in ros-dev folder
+        build: ./ros-dev
+        # Mount ros-dev folder on host to app folder in container
+        volumes:
+            - ./ros-dev:/app
+        # Set DISPLAY variable and network mode for GUIs
+        environment:
+            - DISPLAY=${IP_ADDRESS}:0.0
+        network_mode: "host"
+        # Set working directory in container to app folder
+        working_dir: /app
+
+    # ROS Turtlesim Service
+    ros-turtlesim:
+        # Use Dockerfile in ros-turtlesim folder
+        build: ./ros-turtlesim
+        # Mount ros-turtlesim folder on host to app folder in container
+        volumes:
+            - ./ros-turtlesim:/app
+        # Set DISPLAY variable and network mode for GUIs
+        environment:
+            - DISPLAY=${IP_ADDRESS}:0.0
+        network_mode: "host"
+        # Set working directory in container to app folder
+        working_dir: /app
+        # Run turtlesim script when container is run
+        command: bash -c "./turtlesim.sh"
+
+    # ROS Production Service
+    ros:
+        # Use Dockerfile in ros folder
+        build: ./ros
+        # Mount ros folder on host to app folder in container
+        volumes:
+            - ./ros:/app
+        # Set DISPLAY variable and network mode for GUIs
+        environment:
+            - DISPLAY=${IP_ADDRESS}:0.0
+        network_mode: "host"
+        # Set working directory in container to app folder
+        working_dir: /app
+
+    # Gazebo Production Service
+    gazebo:
+        # Use Dockerfile in gazebo folder
+        build: ./gazebo
+        # Mount gazebo folder on host to app folder in container
+        volumes:
+            #- .docker_env/gazebo/.gazebo:/root/.gazebo
+            - ../src/rrrobot_ws:/app/rrrobot_ws
+        # Set DISPLAY variable and network mode for GUIs
+        environment:
+            - DISPLAY=${IP_ADDRESS}:0.0
+        # network_mode: "host"
+        # Set working directory in container to app folder
+        #working_dir: /home/rrrobot
+        hostname: "rrrobot-env"
+        networks:
+            - ros
+    
+    # GEAR Production Service
+    gear:
+        # Use Dockerfile in gear folder
+        build: ./gear
+        # Mount gear folder on host to app folder in container
+        volumes:
+            - ../src/rrrobot_ws:/app/rrrobot_ws
+        # Set DISPLAY variable and network mode for GUIs
+        environment:
+            - DISPLAY=${IP_ADDRESS}:0.0
+        # Set working directory in container to app folder
+        working_dir: /app
+        hostname: "rrrobot-env"
+        networks:
+            - ros

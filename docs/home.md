@@ -1,5 +1,10 @@
 # RRRobot! <!-- omit in toc -->
 
+## Page Links <!-- omit in toc -->
+- [Home](home.md)
+- [Documentation](documentation.md)
+- [GEAR](gear.md)
+
 ## Table of Contents <!-- omit in toc -->
 - [Contributors](#contributors)
 - [Documents](#documents)
@@ -8,6 +13,10 @@
   - [Docker Compose Services](#docker-compose-services)
   - [GUI Support](#gui-support)
   - [Running Docker Containers](#running-docker-containers)
+  - [Gazebo Grasping Simulation](#gazebo-grasping-simulation)
+  - [Tips & Tricks](#tips--tricks)
+- [Source Code Documentation](#source-code-documentation)
+- [GEAR Final Simulation](#gear-final-simulation)
 
 ## Contributors
 
@@ -28,12 +37,18 @@
 
 1. [Project Poster](1.%20Project%20Poster.pdf)
 2. [Project Proposal](2.%20Project%20Proposal.pdf)
+3. [Final Project Report - Overleaf (Read-Only)](https://www.overleaf.com/read/ncvksrzpvbmr)
+4. [Draft Video](https://youtu.be/powEVDPQNEY)
 
 ## Introduction
 
 Repository for UMICH EECS 467: Autonomous Robotics (W20) RRRobot! project.
 
 To get started, you will need to install Docker on your system. Information on what Docker is, how to install it, and how to use it can be found in [Getting Started with Docker](https://sravanbalaji.com/Web%20Pages/blog_docker.html).
+
+Once installed, you can run our final simulation by following the instructions on the [GEAR](gear.md) page.
+
+Information about our source code can be found on the [Documentation](documentation.md) page.
 
 ## Development Guide
 
@@ -51,15 +66,19 @@ ros-turtlesim is a container that tests whether GUI support is working. This wil
 
 #### ros <!-- omit in toc -->
 
-ros is the production container for all ROS nodes we create. This is meant to run our final code and interface with the gazebo container for simulation.
+ros is a container based on the ROS Melodic docker image. This is provided for convenience, but not used for running the final simulation.
 
 #### gazebo <!-- omit in toc -->
 
-Similarly to ros, gazebo is the production container for gazebo. This is meant to run our final simulation.
+gazebo is a container based on the Gazebo Server 9 docker image. This is provided for convenience, but not used for running the final simulation.
+
+#### gear <!-- omit in toc -->
+
+The GEAR container includes the Gazebo Environment for Agile Robotics from the Agile Robotics for Industrial Automation Competition 2019. This is used for running the final simulation.
 
 ### GUI Support
 
-If using VcXsrv for Windows to enable GUI applications, run XLaunch using [config.xlaunch](utils/config.xlaunch). This will enable the following settings:
+If using VcXsrv for Windows to enable GUI applications, run XLaunch using [config.xlaunch](https://github.com/EECS-467-W20-RRRobot-Project/RRRobot/blob/master/utils/config.xlaunch). This will enable the following settings:
 
 - Display Settings
   - Multiple Windows
@@ -83,7 +102,12 @@ libGL error: failed to load driver: swrast
 
 As mentioned in [No libGL libraries when running Gazebo from ROS](https://github.com/microsoft/WSL/issues/3644#issuecomment-434556680), this can be resolved by disabling `No native OpenGL` in the VcXsrv configuration.
 
-Additionally, be sure to update the `IP_ADDRESS` variable in [.env](src/.env) with your computer's IP Address to enable X forwarding.
+You will need to update your environment variable with your IP Address to enable X forwarding. You can create a file called **.env** in the same directory as the docker-compose.yml file with your IP address as shown below. You can also edit the [docker-compose.yml](https://github.com/EECS-467-W20-RRRobot-Project/RRRobot/blob/master/docker_env/docker-compose.yml) to remove the dependence on the `IP_ADDRESS` environment variable.
+
+```
+# .env for docker-compose
+IP_ADDRESS=<IP Address Here>
+```
 
 ### Running Docker Containers
 
@@ -95,5 +119,35 @@ Additionally, be sure to update the `IP_ADDRESS` variable in [.env](src/.env) wi
     - Other: `docker-machine env`
 3. Navigate to src folder
     - `cd /PATH/TO/rrrobot/src`
-4. Use Docker Compose to run a service (refer to [docker-compose.yml](src/docker-compose.yml) or [Docker Compose Services](#docker-compose-services))
+4. Use Docker Compose to run a service (refer to [docker-compose.yml](https://github.com/EECS-467-W20-RRRobot-Project/RRRobot/blob/master/docker_env/docker-compose.yml) or [Docker Compose Services](#docker-compose-services))
    - `docker-compose run --rm <service_name>`
+
+### Gazebo Grasping Simulation
+
+1. Source ROS Setup
+   - `source /opt/ros/melodic/setup.bash`
+2. Build the drivers for the simulation
+   - `cd /app/rrrobot_src/src/simulation_drivers/`
+   - `source build.sh`
+3. Start ros master node
+   - `roscore &`
+4. Run the gazebo simulator - this will bring up gazebo with a robotic arm
+   - `gazebo /app/rrrobot_src/world/rrrobot.world`
+5. Run control and perception programs
+
+### Tips & Tricks
+
+- Clear space on docker machine
+  - `docker system prune --volumes`
+- See running containers
+  - `docker ps`
+- Attach a new terminal to a running container
+  - `docker exec -it -u root <container> bash`
+
+## Source Code Documentation
+
+Documentation on our source code can be found on the [Documentation](documentation.md) page.
+
+## GEAR Final Simulation
+
+Instructions for running our final GEAR simulation can be found on the [GEAR](gear.md) page.

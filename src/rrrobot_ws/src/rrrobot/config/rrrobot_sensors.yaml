@@ -1,0 +1,6 @@
+sensors:
+    depth_camera_1:
+      type: depth_camera
+      pose:
+        xyz: [1.0, 1.2, 1.4]
+        rpy: [0, 1.21, 0]
