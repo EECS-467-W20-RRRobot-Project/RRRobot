@@ -50,7 +50,7 @@ def call_back(filename):
     print('type: ', type_dict[predicted_label])
 
     # publish a message, name of this node is 'cv_model'
-    pub = rospy.Publisher('cv_model', String, queue_size=10)
+    pub = rospy.Publisher('/cv_model', String, queue_size=10)
     # rospy.init_node('talker', anonymous=True)
     rate = rospy.Rate(10) # 10hz
 
