@@ -1,4 +1,0 @@
-[submodule "src/moveit_ws/src/universal_robot"]
-	path = src/ariac_ws/src/universal_robot
-	url = https://github.com/EECS-467-W20-RRRobot-Project/universal_robot.git
-	branch = ariac_2019_ur10_moveit_config
