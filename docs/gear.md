@@ -150,3 +150,11 @@ In terminal 1, run the script that will build all components and run the nodes. 
 #### Terminal 2 <!-- omit in toc -->
 
 When a new item is spawned after the arm drops off the previous item, the conveyor belt must be manually started again using `rosservice call /ariac/conveyor/control "power: 100"` so that the item moves to the depth camera and the process can continue. You can do this in a new terminal since terminal 1 is running all of the simulation nodes.
+
+#### Troubleshooting <!-- omit in toc -->
+
+If you encounter issues with newline characters when attempting to run scripts, use the `dos2unix` tool to convert them to linux style newline characters.
+These errors usually look like `/bin/bash^M: bad interpreter: No such file or directory` or `env: python\r: No such file or directory`.
+
+- `sudo apt-get install -y dos2unix`
+- `dos2unix <file_path>`
