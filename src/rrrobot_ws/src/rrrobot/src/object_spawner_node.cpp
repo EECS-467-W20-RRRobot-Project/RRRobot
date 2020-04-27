@@ -20,7 +20,7 @@ class ObjectSpawner
 {
 public:
     ObjectSpawner(const std::string &model_file = "/app/rrrobot_ws/src/gazebo_models/model_mappings.txt")
-        : DEFAULT_SPAWN_POINT(1.21825, 5.474367, 0.937978),
+        : DEFAULT_SPAWN_POINT(1.21825, 4.0, 0.937978),
           CONVEYOR_WIDTH(0.391404)
     {
         // DEFAULT_SPAWN_POINT.x = 0.2516105;
