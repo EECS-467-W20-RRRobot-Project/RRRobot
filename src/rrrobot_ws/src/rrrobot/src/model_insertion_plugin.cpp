@@ -1,3 +1,5 @@
+// model_insertion_plugin.cpp
+
 #include <ignition/math/Pose3.hh>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/common/common.hh"

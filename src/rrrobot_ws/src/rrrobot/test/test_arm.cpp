@@ -1,4 +1,4 @@
-// arm_controller_node.cpp
+// test_arm.cpp
 
 #include <algorithm>
 #include <vector>

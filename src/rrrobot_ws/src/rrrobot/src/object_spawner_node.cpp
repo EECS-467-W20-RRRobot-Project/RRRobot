@@ -1,3 +1,5 @@
+// object_spawner_node.cpp
+
 #include <vector>
 #include <string>
 #include <stdlib.h>
@@ -13,8 +15,7 @@
 #include <kdl/frames.hpp>
 
 #include <iostream>
-using std::cout;
-using std::endl;
+using namespace std;
 
 class ObjectSpawner
 {

@@ -1,4 +1,4 @@
-// arm_controller_node.cpp
+// arm_representation.h
 
 #include <algorithm>
 #include <vector>

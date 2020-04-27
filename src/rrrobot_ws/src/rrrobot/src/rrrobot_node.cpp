@@ -1,16 +1,4 @@
-// Copyright 2016 Open Source Robotics Foundation, Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// rrrobot_node.cpp
 
 #include <algorithm>
 #include <vector>
@@ -38,8 +26,7 @@
 #include "topic_names.h"
 #include "rrrobot/arm_command.h"
 
-using std::cout;
-using std::endl;
+using namespace std;
 
 class Position
 {
@@ -78,8 +65,7 @@ public:
 		desired_drop_pose.position.x = drop_point.x;
 		desired_drop_pose.position.y = drop_point.y;
 		desired_drop_pose.position.z = drop_point.z;
-		// TODO: set the desired orientation of the end effector to point straight down
-
+		
 		// update state
 		if (current_robot_state & RobotState::WAITING_FOR_GRAB_LOCATION)
 		{
@@ -93,7 +79,7 @@ public:
 			publish_arm_command();
 		}
 
-		print_state();
+		// print_state();
 	}
 
 	void gripper_state_callback(const osrf_gear::VacuumGripperState &state)
@@ -117,7 +103,7 @@ public:
 		// store current state
 		gripper_state = state;
 
-		print_state();
+		// print_state();
 	}
 
 	void grasp_pose_callback(const geometry_msgs::Pose &grasp_pose)
@@ -126,7 +112,7 @@ public:
 		set_conveyor(0);
 
 		desired_grasp_pose = grasp_pose;
-		// TODO: Tune z offset so end effector doesn't hit object
+		// Add z offset so end effector doesn't hit object
 		desired_grasp_pose.position.z += 0.01;
 
 		if (current_robot_state & RobotState::WAITING_FOR_CLASSIFICATION)
@@ -140,7 +126,7 @@ public:
 			publish_arm_command();
 		}
 
-		print_state();
+		// print_state();
 	}
 
 private:
@@ -168,6 +154,7 @@ private:
 	Position trash_bin = Position(-0.3, 0.383, 1);
 	Position recycle_bin = Position(-0.3, 1.15, 1);
 
+	// Determine item destination bin based on classification
 	Position destination(const std::string &type) const
 	{
 		Position pos;
@@ -184,6 +171,7 @@ private:
 		return pos;
 	}
 
+	// Publish message including grab and drop off location for arm controller
 	void publish_arm_command()
 	{
 		rrrobot::arm_command cmd;
@@ -194,6 +182,7 @@ private:
 		ros::spinOnce();
 	}
 
+	// Set conveyor power (0 or 50-100)
 	void set_conveyor(int power)
 	{
 		if (power != 0 && (power < 50 || power > 100))
@@ -206,6 +195,7 @@ private:
 		conveyor_pub.call(cmd);
 	}
 
+	// Print current state for debugging
 	void print_state()
 	{
 		if (current_robot_state & RobotState::WAITING_FOR_CLASSIFICATION)

@@ -45,6 +45,7 @@ using namespace std;
 class ArmController
 {
 public:
+    // Constructor
     ArmController(ros::NodeHandle &node, ArmRepresentation *arm_, double time_per_step, int retry_attempts, double item_attach_z_adjustment) : gripper_enabled_(false), item_attached_(false), arm(arm_), time_per_step(time_per_step), retry_attempts(retry_attempts), item_attach_z_adjustment(item_attach_z_adjustment)
     {
         arm_joint_trajectory_publisher_ = node.advertise<trajectory_msgs::JointTrajectory>(ARM_COMMAND_CHANNEL, 10);
@@ -55,28 +56,24 @@ public:
 
         /* initialize random seed: */
         srand(time(NULL));
-
-        // arm = std::move(arm_);
-        // ROS_INFO("Arm size (in constructor): %d", arm->getChain()->getNrOfJoints());
-        // arm_current_joint_states_ = KDL::JntArray(arm->getChain()->getNrOfJoints());
-        // KDL::SetToZero(arm_current_joint_states_);
     }
 
+    // Receive joint state messages
     void joint_state_callback(const sensor_msgs::JointState &joint_state_msg)
     {
-        // ROS_INFO("Received joint state");
-
-        // Convert std_msgs::double[] to KDL::JntArray
+        // Copy joint states to private variable arm_current_joint_states_
         int nbr_joints = arm->getChain()->getNrOfJoints();
         vector<string> msg_joint_names = joint_state_msg.name;
         vector<string> cur_joint_names = arm->get_joint_names();
         vector<double> position = joint_state_msg.position;
 
+        // Set all values to 0
         for (int i = 0; i < nbr_joints; ++i)
         {
             arm_current_joint_states_[i] = 0.0;
         }
 
+        // Match up joint names from message to internal joint names order
         for (size_t i = 0; i < position.size(); ++i)
         {
             for (size_t j = 0; j < cur_joint_names.size(); ++j)
@@ -89,12 +86,15 @@ public:
         }
     }
 
+    // Receive gripper state messages
     void gripper_state_callback(const osrf_gear::VacuumGripperState::ConstPtr &gripper_state_msg)
     {
+        // Store message states in private variables
         gripper_enabled_ = gripper_state_msg->enabled;
         item_attached_ = gripper_state_msg->attached;
     }
 
+    // Receive message from RRRobot node with desired pose to pick up object from conveyor belt
     void arm_destination_callback(const rrrobot::arm_command &target_pose)
     {
         ROS_INFO("Received target pose");
@@ -161,9 +161,8 @@ public:
 
         // Move item to desired position
         attempts = 1;
-        // if (calc_joint_positions(target_pose.drop_location, above_bins, positions))
-        //     send_joint_trajectory(positions, arm_action_phase::belt_to_bin);
         KDL::Frame end_effector_pose;
+        
         if (target_pose.drop_location.position.y > 1.0)
         {
             positions = bin1;
@@ -194,7 +193,6 @@ public:
                 return;
             }
 
-            // if (calc_joint_positions(target_pose.grab_location, get_randomized_start_state(above_bins) /*target_pose.drop_location.position.y)*/, positions))
             send_joint_trajectory(positions, arm_action_phase::belt_to_bin);
             attempts++;
         }
@@ -256,26 +254,24 @@ private:
     const vector<double> bin1 = {0.05, 0.0, -2.2, -2.2, -0.25, 1.5708, 0.0};
     const vector<double> bin2 = {-0.7, 0.0, -2.2, -2.2, -0.25, 1.5708, 0.0};
 
+    // Randomize start state to avoid inverse kinematics getting stuck in local minimum
     vector<double> get_randomized_start_state(const vector<double> &preferred_state)
     {
-        //int state_to_return = rand() % 2;
-
-        // if (state == 0)
-        //     return preferred_state;
-
         vector<double> cur;
         std::stringstream location;
         location << "Random location: ";
         // cur.push_back(y);
-        for (size_t pos = 0; pos < arm->getChain()->getNrOfJoints(); ++pos)
-        {
+        for (size_t pos = 0; pos < arm->getChain()->getNrOfJoints(); ++pos) {
             int val = rand() % 2;
             double diff = 0;
-            if (val == 1)
+            
+            if (val == 1) {
                 diff = -0.1;
-            else
+            }
+            else {
                 diff = 0.1;
-            // double val = (rand() % 70) / 100.0;
+            }
+            
             cur.push_back(preferred_state[pos] + diff);
             location << cur[pos] << " ";
         }
@@ -286,10 +282,9 @@ private:
         return cur;
     }
 
+    // Use inverse kinematics to calculate joint positions to reach desired pose 
     bool calc_joint_positions(const geometry_msgs::Pose &pose, const vector<double> &start_state, vector<double> &positions)
     {
-        // KDL::JntArray cur_configuration(arm->getChain()->getNrOfJoints()); // = arm_current_joint_states_;
-        // KDL::SetToZero(cur_configuration);
         KDL::Frame desired_end_effector_pose = pose_to_frame(pose);
         KDL::JntArray final_joint_configuration(arm->getChain()->getNrOfJoints());
 
@@ -306,16 +301,16 @@ private:
         // Convert data attribute (Eigen::VectorXd) of KDL::JntArray to double[] via data() function
         int nbr_joints = arm->getChain()->getNrOfJoints();
         Eigen::VectorXd mat = final_joint_configuration.data;
-        // cout << mat << endl;
         positions.clear();
-        // vector<double> positions;
         std::stringstream pos_str;
         pos_str << "Calculated joint positions: ";
+        
         for (size_t idx = 0; idx < arm->getChain()->getNrOfJoints(); ++idx)
         {
             positions.push_back(mat[idx]);
             pos_str << mat[idx] << " ";
         }
+        
         pos_str << '\n';
 
         ROS_INFO(pos_str.str().c_str());
@@ -323,6 +318,7 @@ private:
         return (error_code == 0);
     }
 
+    // Use forward kinematics to calculate end effector pose from current joint states
     KDL::Frame calc_end_effector_pose()
     {
         int num_joints = arm->getChain()->getNrOfJoints();
@@ -347,6 +343,7 @@ private:
         return end_effector_pose;
     }
 
+    // Convert from Pose to KDL::Frame
     KDL::Frame pose_to_frame(const geometry_msgs::Pose &pose)
     {
         double p_x = pose.position.x;
@@ -363,6 +360,7 @@ private:
         return KDL::Frame(rot, pos);
     }
 
+    // Convert from KDL::Frame to Pose
     geometry_msgs::Pose frame_to_pose(const KDL::Frame &frame)
     {
         double p_x = frame.p.x();
@@ -386,6 +384,7 @@ private:
         return pose;
     }
 
+    // Send desired joint states to joint controller 
     void send_joint_trajectory(const vector<double> &target, arm_action_phase phase)
     {
         // Declare JointTrajectory message
@@ -448,6 +447,7 @@ private:
         ros::Duration((num_points + 1) * time_per_step).sleep();
     }
 
+    // Turn gripper on or off
     bool gripper_control(bool state)
     {
         osrf_gear::VacuumGripperControl srv;
@@ -463,9 +463,10 @@ private:
         return success;
     }
 
+    // Check if the end effector has reached the target position (within threshold)
     bool have_reached_target(geometry_msgs::Pose cur, geometry_msgs::Pose target)
     {
-        // Tune threshold values
+        // Threshold values
         float pos_thresh = 0.15; // Meters
         float rot_thresh = 0.05;
 
@@ -485,10 +486,10 @@ private:
         float qz_err = fabs(fabs(cur.orientation.z) - fabs(target.orientation.z));
         float qw_err = fabs(fabs(cur.orientation.w) - fabs(target.orientation.w));
 
-        ROS_INFO_STREAM("qx_err: " << qx_err << " (" << rot_thresh << ")");
-        ROS_INFO_STREAM("qy_err: " << qy_err << " (" << rot_thresh << ")");
-        ROS_INFO_STREAM("qz_err: " << qz_err << " (" << rot_thresh << ")");
-        ROS_INFO_STREAM("qw_err: " << qw_err << " (" << rot_thresh << ")");
+        // ROS_INFO_STREAM("qx_err: " << qx_err << " (" << rot_thresh << ")");
+        // ROS_INFO_STREAM("qy_err: " << qy_err << " (" << rot_thresh << ")");
+        // ROS_INFO_STREAM("qz_err: " << qz_err << " (" << rot_thresh << ")");
+        // ROS_INFO_STREAM("qw_err: " << qw_err << " (" << rot_thresh << ")");
 
         if (qx_err > rot_thresh)
         {
@@ -516,7 +517,7 @@ private:
 
 int main(int argc, char **argv)
 {
-    cout << "Starting arm_controller_node" << endl;
+    ROS_INFO("Starting arm_controller_node");
 
     // Last argument is the default name of the node.
     ros::init(argc, argv, "arm_controller_node");
@@ -525,19 +526,19 @@ int main(int argc, char **argv)
 
     ArmRepresentation arm;
 
+    // Set parameters
     double time_per_step = 3.0; // seconds
     int retry_attempts = 3;
     double item_attach_z_adjustment = 0.05; // meters
     ArmController ac(node, &arm, time_per_step, retry_attempts, item_attach_z_adjustment);
 
+    // Start asynchronous spinner to receive messages on subscribed topics
     ros::AsyncSpinner spinner(0);
     spinner.start();
 
-    // Subscribe to arm destination and joint states channels
+    // Subscribe to ROS topics
     ros::Subscriber arm_destination_sub = node.subscribe(ARM_DESTINATION_CHANNEL, 1, &ArmController::arm_destination_callback, &ac);
-
     ros::Subscriber gripper_state_sub = node.subscribe(GRIPPER_STATE_CHANNEL, 1, &ArmController::gripper_state_callback, &ac);
-
     ros::Subscriber joint_state_sub = node.subscribe(ARM_JOINT_STATES_CHANNEL, 1, &ArmController::joint_state_callback, &ac);
 
     ROS_INFO("Setup complete");

@@ -252,21 +252,7 @@ void depth_camera_callback(const sensor_msgs::PointCloud::ConstPtr &cloud_msg)
 
 		// publish pose
 		pub.publish(pose);
-
-		// compute normals
 	}
-
-	//std::cerr<< "segmented:  " << (int)point_cloud_segmented->size() << "\n";
-
-	// Convert to ROS data type
-	//point_cloud_segmented->header.frame_id = point_cloudPtr->header.frame_id;
-	//if(point_cloud_segmented->size()) pcl::toPCLPointCloud2(*point_cloud_segmented, cloud_filtered);
-	//else pcl::toPCLPointCloud2(*point_cloudPtr, cloud_filtered);
-	//sensor_msgs::PointCloud2 output;
-	//pcl_conversions::fromPCL(cloud_filtered, output);
-
-	// Publish the data
-	//pub.publish (output);
 }
 
 int main(int argc, char **argv)

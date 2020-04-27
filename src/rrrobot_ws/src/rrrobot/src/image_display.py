@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# image_display.py
+
 import rospy
 from std_msgs.msg import String
 import matplotlib.pyplot as plt

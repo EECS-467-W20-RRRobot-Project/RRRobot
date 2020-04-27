@@ -1,14 +1,14 @@
-// arm_controller_node.cpp
+// arm_representation.cpp
 
 #include "arm_representation.h"
 #include <math.h>
 
-// using namespace std;
-using std::string;
-using std::vector;
+using namespace std;
 
+// Constructor
 ArmRepresentation::ArmRepresentation(const KDL::Frame &base_pose)
 {
+    // Parameters for coordinate transformations of robot links and joints
     const double base_len = 0.2;
     const double shoulder_height = 0.1273;
     const double upper_arm_length = 0.612;
@@ -19,10 +19,7 @@ ArmRepresentation::ArmRepresentation(const KDL::Frame &base_pose)
     const double wrist_2_length = 0.1157;
     const double wrist_3_length = 0.0922;
 
-    // KDL::Vector pos; //(0, 0, base_len/2);
-    // KDL::Rotation rot;
-
-    // The joints might be off by one
+    // Define chain of links and joints using KDL
     KDL::Segment linear_arm_actuator("linear_arm_actuator_joint",
                                      KDL::Joint(KDL::Joint::JointType::None), base_pose);
     chain.addSegment(linear_arm_actuator);
@@ -74,23 +71,9 @@ ArmRepresentation::ArmRepresentation(const KDL::Frame &base_pose)
     KDL::Segment ee_link("ee_link", KDL::Joint("wrist_3_joint", KDL::Joint::JointType::RotY), //KDL::Joint(KDL::Joint::JointType::None),
                          KDL::Frame(rot_ee, pos_ee));
     chain.addSegment(ee_link);
-
-    // arm.addSegment(base_link);
-    // arm.addSegment(shoulder_link);
-    // arm.addSegment(upper_arm_link);
-    // arm.addSegment(forearm_link);
-    // arm.addSegment(wrist_1_link);
-    // arm.addSegment(wrist_2_link);
-    // arm.addSegment(wrist_3_link);
-    // arm.addSegment(ee_link);
-
-    // fk_solver = KDL::ChainFkSolverPos_recursive(chain);
-    // ik_solver = KDL::ChainIkSolverPos_LMA(chain);
-
-    // fk_solver.reset(new KDL::ChainFkSolverPos_recursive(arm));
-    // ik_solver.reset(new KDL::ChainIkSolverPos_LMA(arm));
 }
 
+// Use KDL to calculate position of end effector from joint states
 int ArmRepresentation::calculateForwardKinematics(const KDL::JntArray &joint_positions, KDL::Frame &end_effector_pose, int joint_nbr)
 {
     KDL::ChainFkSolverPos_recursive fk_solver(chain);
@@ -99,6 +82,7 @@ int ArmRepresentation::calculateForwardKinematics(const KDL::JntArray &joint_pos
     return status;
 }
 
+// Use KDL to calculate joint states from position of end effector
 int ArmRepresentation::calculateInverseKinematics(const vector<double> &cur_configuration,
                                                   const KDL::Frame &desired_end_effector_pose,
                                                   KDL::JntArray &final_joint_configuration)
@@ -119,6 +103,7 @@ int ArmRepresentation::calculateInverseKinematics(const vector<double> &cur_conf
     return status;
 }
 
+// Get vector of joint names
 vector<string> ArmRepresentation::get_joint_names()
 {
     vector<string> joint_names;
@@ -132,6 +117,7 @@ vector<string> ArmRepresentation::get_joint_names()
     return joint_names;
 }
 
+// Return reference to object
 KDL::Chain *ArmRepresentation::getChain()
 {
     return &chain;
