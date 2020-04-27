@@ -1,6 +1,10 @@
-generic_recyclable,/app/rrrobot_ws/src/gazebo_models/plastic_bottle/images/plastic-bottle-1.jpg,plastic
-generic_recyclable,/app/rrrobot_ws/src/gazebo_models/paper_bag/images/paper-bag-1.jpg,paper
-generic_recyclable,/app/rrrobot_ws/src/gazebo_models/pop_can/images/pop-can-1.jpg,metal
-generic_trash,/app/rrrobot_ws/src/gazebo_models/trash_images/chips-1.jpg,trash
-generic_trash,/app/rrrobot_ws/src/gazebo_models/trash_images/chips-2.jpeg,trash
-generic_trash,/app/rrrobot_ws/src/gazebo_models/trash_images/chips-3.jpg,trash
+generic_recyclable,/app/rrrobot_ws/src/gazebo_models/recycling_images/plastic.jpg,plastic
+generic_recyclable,/app/rrrobot_ws/src/gazebo_models/recycling_images/paper.jpg,paper
+generic_recyclable,/app/rrrobot_ws/src/gazebo_models/recycling_images/metal.jpg,metal
+generic_recyclable,/app/rrrobot_ws/src/gazebo_models/recycling_images/glass.jpg,glass
+generic_recyclable,/app/rrrobot_ws/src/gazebo_models/recycling_images/cardboard.jpg,cardboard
+generic_trash,/app/rrrobot_ws/src/gazebo_models/trash_images/trash_1.jpg,trash
+generic_trash,/app/rrrobot_ws/src/gazebo_models/trash_images/trash_2.jpg,trash
+generic_trash,/app/rrrobot_ws/src/gazebo_models/trash_images/trash_3.jpg,trash
+generic_trash,/app/rrrobot_ws/src/gazebo_models/trash_images/trash_4.jpg,trash
+generic_trash,/app/rrrobot_ws/src/gazebo_models/trash_images/trash_5.jpg,trash
