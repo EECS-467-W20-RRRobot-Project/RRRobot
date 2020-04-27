@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <fstream>
+#include <iostream>
 
 #include <ros/ros.h>
 
@@ -36,6 +37,9 @@
 
 #include "topic_names.h"
 #include "rrrobot/arm_command.h"
+
+using std::cout;
+using std::endl;
 
 class Position
 {
@@ -66,7 +70,7 @@ public:
 		comp_start.call(trg);
 	}
 
-	void cv_classification_callback(const std_msgs::String & classification)
+	void cv_classification_callback(const std_msgs::String &classification)
 	{
 		std::string type = classification.data.substr(classification.data.find(":") + 1);
 
@@ -88,6 +92,8 @@ public:
 			// tell the arm to move to grab the object
 			publish_arm_command();
 		}
+
+		print_state();
 	}
 
 	void gripper_state_callback(const osrf_gear::VacuumGripperState &state)
@@ -110,6 +116,8 @@ public:
 
 		// store current state
 		gripper_state = state;
+
+		print_state();
 	}
 
 	void grasp_pose_callback(const geometry_msgs::Pose &grasp_pose)
@@ -131,6 +139,8 @@ public:
 
 			publish_arm_command();
 		}
+
+		print_state();
 	}
 
 private:
@@ -192,6 +202,23 @@ private:
 		osrf_gear::ConveyorBeltControl cmd;
 		cmd.request.power = power;
 		conveyor_pub.call(cmd);
+	}
+
+	void print_state()
+	{
+		if (current_robot_state & RobotState::WAITING_FOR_CLASSIFICATION)
+		{
+			cout << "Waiting for classification\t";
+		}
+		if (current_robot_state & RobotState::WAITING_FOR_GRAB_LOCATION)
+		{
+			cout << "Waiting for grab location\t";
+		}
+		if (current_robot_state & RobotState::MOVING_ARM)
+		{
+			cout << "Moving Arm\t";
+		}
+		cout << endl;
 	}
 };
 
