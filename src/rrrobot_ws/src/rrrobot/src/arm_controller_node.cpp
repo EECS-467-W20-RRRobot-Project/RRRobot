@@ -355,7 +355,7 @@ private:
 
         arm_joint_trajectory_publisher_.publish(msg);
 
-        // TODO: Wait to reach target
+        // Wait to reach target
         ros::Duration((num_points+1)*time_per_step).sleep();
     }
 
@@ -375,9 +375,9 @@ private:
 
     bool have_reached_target(geometry_msgs::Pose cur, geometry_msgs::Pose target)
     {
-        // TODO: Tune threshold values
+        // Tune threshold values
         float pos_thresh = 0.15; // Meters
-        float rot_thresh = 0.025;
+        float rot_thresh = 0.05;
 
         float pos_err = fabs(cur.position.x - target.position.x) +
                         fabs(cur.position.y - target.position.y) +
@@ -436,7 +436,7 @@ int main(int argc, char **argv)
 
     double time_per_step = 3.0; // seconds
     int retry_attempts = 3;
-    double item_attach_z_adjustment = 0.025; // meters
+    double item_attach_z_adjustment = 0.05; // meters
     ArmController ac(node, &arm, time_per_step, retry_attempts, item_attach_z_adjustment);
 
     ros::AsyncSpinner spinner(0);

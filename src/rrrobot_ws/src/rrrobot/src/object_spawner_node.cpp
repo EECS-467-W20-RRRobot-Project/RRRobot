@@ -99,7 +99,7 @@ private:
             image_file_msg.data = models[rand_idx].image_file;
             cout << "Spawning " << msg.model_name << endl;
 
-            // TODO: Determine position to spawn items
+            // Determine position to spawn items
             // can place objects on conveyor belt just upstream from the arms
             // at roughly (0.2516105, 5.474367, 0.935669)
             // x range: 1.022548-1.413952

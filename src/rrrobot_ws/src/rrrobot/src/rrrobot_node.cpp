@@ -119,7 +119,7 @@ public:
 
 		desired_grasp_pose = grasp_pose;
 		// TODO: Tune z offset so end effector doesn't hit object
-		desired_grasp_pose.position.z += 0.01;
+		desired_grasp_pose.position.z -= 0.025;
 
 		if (current_robot_state & RobotState::WAITING_FOR_CLASSIFICATION)
 		{

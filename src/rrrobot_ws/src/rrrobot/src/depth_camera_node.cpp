@@ -271,18 +271,16 @@ void depth_camera_callback(const sensor_msgs::PointCloud::ConstPtr &cloud_msg)
 
 int main(int argc, char **argv)
 {
-	// TODO: Subscribe to depth camera topic
 	// Last argument is the default name of the node.
 	ros::init(argc, argv, "depth_camera_node");
 
 	ros::NodeHandle node;
 
+	// Subscribe to depth camera topic
 	ros::Subscriber sub = node.subscribe("/ariac/depth_camera_1", 1, depth_camera_callback);
 
+	// Publish object's current location to topic for RRRobot node to listen to
 	pub = node.advertise<geometry_msgs::Pose>(DESIRED_GRASP_POSE_CHANNEL, 1);
 
 	ros::spin();
-	// TODO: When item is in view, work with point cloud to get location (in world frame) for arm to reach to pickup item
-
-	// TODO: Publish object's current location to topic for RRRobot node to listen to
 }

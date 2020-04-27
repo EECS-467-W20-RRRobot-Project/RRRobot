@@ -4,9 +4,9 @@ source /app/rrrobot_ws/devel/setup.bash
 
 rostopic pub /arm_controller/destination rrrobot/arm_command "grab_location:
   position:
-    x: 1.22003614902
-    y: 1.22740316391
-    z: 0.97
+    x: 1.22
+    y: 1.22
+    z: 0.9725
   orientation:
     x: 0.0
     y: 0.707
