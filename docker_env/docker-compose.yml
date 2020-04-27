@@ -78,7 +78,6 @@ services:
         # Mount gear folder on host to app folder in container
         volumes:
             - ../src/rrrobot_ws:/app/rrrobot_ws
-            - ../src/ariac_ws:/app/ariac_ws
         # Set DISPLAY variable and network mode for GUIs
         environment:
             - DISPLAY=${IP_ADDRESS}:0.0

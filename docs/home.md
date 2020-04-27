@@ -8,8 +8,8 @@
   - [Docker Compose Services](#docker-compose-services)
   - [GUI Support](#gui-support)
   - [Running Docker Containers](#running-docker-containers)
-  - [Gazebo Grasping Simulation](#gazebo-grasping-simulation)
-  - [GEAR Simulation](#gear-simulation)
+  - [Gazebo Grasping Simulation (Testing)](#gazebo-grasping-simulation-testing)
+  - [GEAR Simulation (Final)](#gear-simulation-final)
   - [Tips & Tricks](#tips--tricks)
 
 ## Contributors
@@ -55,15 +55,15 @@ ros-turtlesim is a container that tests whether GUI support is working. This wil
 
 #### ros <!-- omit in toc -->
 
-ros is the production container for all ROS nodes we create. This is meant to run our final code and interface with the gazebo container for simulation.
+ros is a container based on the ROS Melodic docker image. This is provided for convenience, but not used for running the final simulation.
 
 #### gazebo <!-- omit in toc -->
 
-Similarly to ros, gazebo is the production container for gazebo. This is meant to run our final simulation.
+gazebo is a container based on the Gazebo Server 9 docker image. This is provided for convenience, but not used for running the final simulation.
 
 #### gear <!-- omit in toc -->
 
-The GEAR container includes the Gazebo Environment for Agile Robotics from the Agile Robotics for Industrial Automation Competition 2019.
+The GEAR container includes the Gazebo Environment for Agile Robotics from the Agile Robotics for Industrial Automation Competition 2019. This is used for running the final simulation.
 
 ### GUI Support
 
@@ -106,7 +106,7 @@ Additionally, be sure to update the `IP_ADDRESS` variable in [.env](src/.env) wi
 4. Use Docker Compose to run a service (refer to [docker-compose.yml](src/docker-compose.yml) or [Docker Compose Services](#docker-compose-services))
    - `docker-compose run --rm <service_name>`
 
-### Gazebo Grasping Simulation
+### Gazebo Grasping Simulation (Testing)
 
 1. Source ROS Setup
    - `source /opt/ros/melodic/setup.bash`
@@ -119,7 +119,7 @@ Additionally, be sure to update the `IP_ADDRESS` variable in [.env](src/.env) wi
    - `gazebo /app/rrrobot_src/world/rrrobot.world`
 5. Run control and perception programs
 
-### GEAR Simulation
+### GEAR Simulation (Final)
 
 Instructions for working in the GEAR Simulation can be found on the [GEAR](gear.md) page.
 
