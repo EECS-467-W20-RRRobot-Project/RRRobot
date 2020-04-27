@@ -113,12 +113,12 @@ bin_depth = 0.6
 bin_height = 0.72
 bin_angle = 0.0
 default_bin_origins = {
-    'bin1': [-0.3, -1.916, 0],
-    'bin2': [-0.3, -1.15, 0],
-    'bin3': [-0.3, -0.383, 0],
+    # 'bin1': [-0.3, -1.916, 0],
+    # 'bin2': [-0.3, -1.15, 0],
+    # 'bin3': [-0.3, -0.383, 0],
     'bin4': [-0.3, 0.383, 0],
     'bin5': [-0.3, 1.15, 0],
-    'bin6': [-0.3, 1.916, 0],
+    # 'bin6': [-0.3, 1.916, 0],
 }
 
 configurable_options = {
@@ -135,7 +135,7 @@ configurable_options = {
     'visualize_sensor_views': False,
     'visualize_drop_regions': False,
 }
-default_time_limit = 500  # seconds
+default_time_limit = 600  # seconds
 max_count_per_model = 30  # limit on the number of instances of each model type
 
 def initialize_model_id_mappings(random_seed=None):

@@ -57,9 +57,8 @@ RUN pip3 install -U \
         numpy \
         torch \
         torchvision \
-        Pillow
-
-RUN pip3 install pyyaml
-RUN pip3 install rospkg
+        Pillow \
+        pyyaml \
+        rospkg
 
 CMD ["/bin/bash"]

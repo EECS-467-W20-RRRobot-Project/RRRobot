@@ -155,23 +155,19 @@ private:
 	ros::ServiceClient conveyor_pub;
 	ros::Publisher arm_destination_pub;
 
+	Position trash_bin = Position(-0.3, 0.383, 1);
+	Position recycle_bin = Position(-0.3, 1.15, 1);
+
 	Position destination(const std::string &type) const
 	{
 		Position pos;
-		float z = 1;
-
-		if (type == "cardboard")
-			pos = Position(-0.3, -1.916, z);
-		else if (type == "glass")
-			pos = Position(-0.3, -1.15, z);
-		else if (type == "metal")
-			pos = Position(-0.3, -0.383, z);
-		else if (type == "paper")
-			pos = Position(-0.3, 0.383, z);
-		else if (type == "plastic")
-			pos = Position(-0.3, 1.15, z);
-		else if (type == "trash")
-			pos = Position(-0.3, 1.916, z);
+		
+		if(type == "trash") {
+			pos = trash_bin;
+		}
+		else {
+			pos = recycle_bin;
+		}
 
 		return pos;
 	}
