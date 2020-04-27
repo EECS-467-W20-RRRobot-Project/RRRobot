@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
     <name>rrrobot</name>
-    <version>0.1.0</version>
+    <version>1.0.0</version>
     <description>RRRobot package</description>
     <maintainer email="balajsra@umich.edu">Sravan Balaji</maintainer>
     <maintainer email="chenxgu@umich.edu">Chenxi Gu</maintainer>
@@ -16,12 +16,17 @@
     <depend>roscpp</depend>
     <depend>sensor_msgs</depend>
     <depend>std_srvs</depend>
-    <depend>tf2_geometry_msgs</depend>
     <depend>trajectory_msgs</depend>
     <depend>std_msgs</depend>
     <depend>geometry_msgs</depend>
     <depend>gazebo_ros</depend>
     <depend>message_generation</depend>
+    <depend>pcl_ros</depend>
+    <depend>pcl_conversion</depend>
+    <depend>gazebo</depend>
+    <depend>PCL</depend>
+    <depend>Eigen3</depend>
+    <depend>orocos_kdl</depend>
     <exec_depend>message_runtime</exec_depend>
 
 </package>

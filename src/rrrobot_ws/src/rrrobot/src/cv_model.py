@@ -8,19 +8,17 @@ from torch import nn
 from PIL import Image
 
 
-class Model_v1(nn.Module):
+class Model_mobilenet(nn.Module):
     def __init__(self):
-        super(Model_v1, self).__init__()
-        self.resnet = torchvision.models.resnet34(pretrained=True)
-        self.resnet.fc = torch.nn.Linear(512, 512)
-        self.addition = nn.Sequential(
-            nn.BatchNorm1d(512),
-            nn.Dropout(p=0.5),
-            nn.Linear(512, 6))
+        super(Model_mobilenet, self).__init__()
+        self.mobilenet = torchvision.models.mobilenet_v2(pretrained=True)
+
+        self.mobilenet.classifier = nn.Sequential(
+            nn.Dropout(p=0.2, inplace=False),
+            nn.Linear(1280, 6, bias=True))
 
     def forward(self, image):
-        z = self.resnet(image)
-        z = self.addition(z)
+        z = self.mobilenet(image)
         return z
 
 
@@ -28,6 +26,8 @@ def call_back(filename):
     # prepare input file
     filename = filename.data
     input_image = Image.open(filename)
+    if input_image.size[0] < input_image.size[1]:
+            input_image = input_image.transpose(Image.ROTATE_90)
     input_image = input_image.resize((512, 384))
     # print(input_image.size)
     input_image = np.moveaxis(np.asarray(input_image), 2, 0).astype(np.float32)
@@ -57,7 +57,7 @@ def call_back(filename):
     garbage_type = type_dict[predicted_label]
     rospy.loginfo(filename + ':' + garbage_type)
     pub.publish(filename + ':' + garbage_type)
-    rate.sleep()
+    # rate.sleep()
 
 
 def listener():
@@ -69,10 +69,10 @@ def listener():
 
 if __name__ == '__main__':
     rospy.init_node('cv_node')
-    
+
     # prepare pretrained model
-    model = Model_v1()
-    model.load_state_dict(torch.load('v1_0.001.pt', map_location='cpu'))
+    model = Model_mobilenet()
+    model.load_state_dict(torch.load('pytorch_pretrain_model.pt', map_location='cpu'))
     model = model.to('cpu')
     model.eval()
 
