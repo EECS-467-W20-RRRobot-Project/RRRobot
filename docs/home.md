@@ -37,7 +37,7 @@
 
 1. [Project Poster](1.%20Project%20Poster.pdf)
 2. [Project Proposal](2.%20Project%20Proposal.pdf)
-3. [Final Project Report - Overleaf (Read-Only)](https://www.overleaf.com/read/ncvksrzpvbmr)
+3. Final Project Report ([PDF](3.%20Final%20Report.pdf)) ([Overleaf](https://www.overleaf.com/read/ncvksrzpvbmr))
 4. [Draft Video](https://youtu.be/powEVDPQNEY)
 
 ## Introduction
