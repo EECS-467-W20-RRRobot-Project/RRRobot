@@ -55,6 +55,7 @@ Our ROS package contains several folders.
 
 - `arm_controller_node.cpp` receives a pose from rrrobot_node to pick up the object, then uses inverse kinematics to determine the joint positions that will achieve the desired end-effector pose.
 - `arm_representation_node.cpp` interfaces with [KDL](http://docs.ros.org/melodic/api/orocos_kdl/html/index.html) to perform inverse and forward kinematics on our ur10 robot arm model.
+- `cv_model_architectures.py` defines the 3 model architectures we attempted.
 - `cv_model.py` uses `pytorch_pretrain_model.pt` to classify images that it receives and send the classification to rrrobot_node.
 - `depth_camera_node.cpp` takes depth camera information and determines an end-effector pose for the robot arm to reach so it can pick up the object.
 - `image_display.py` is a test script that uses [matplotlib](https://matplotlib.org/) to display images.
